@@ -35,9 +35,12 @@ This repository contains the Minimum Viable Product (MVP) focused on the core ba
 * **Command-Line Interface (CLI):** All user interactions occur via text commands in the terminal.
 * **User Authentication:** Basic login functionality for different user roles (e.g., child patient, administrator/doctor).
 * **Text-Based Avatar Customization:** Logic allowing users to manage avatar attributes through CLI commands.
-* **Progress Tracking:** Functionality to record and display CMAS test progress data via the CLI.
 * **SQLite Database Integration:** Use of an SQLite database (`data/application.db`) for persisting user, avatar, and progress information.
+
+## Extra
+
 * **Basic Anomaly Finder Logic:** A rudimentary implementation demonstrating the concept of data anomaly detection, likely presenting findings via CLI output.
+* **Progress Tracking:** Functionality to record and display CMAS test progress data via the CLI.
 
 ## Technology Stack
 
