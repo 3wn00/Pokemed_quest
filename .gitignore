@@ -1,0 +1,59 @@
+# Compiled Java class files
+*.class
+
+# Log files
+*.log
+
+# Package files (JARs are often built, not stored, unless they are libs)
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# Build output directories
+target/
+bin/
+out/
+
+# IDE specific files/folders
+.vscode/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+nbproject/ # NetBeans specific
+
+# Maven and Gradle files (if you add them later)
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+build/
+.gradle/
+buildSrc/ # Usually project-specific Gradle build code
+
+# Java Virtual Machine crash logs
+hs_err_pid*
+replay_pid*
+
+# SQLite Database Files (in the data directory)
+# Ignore the main db file and temporary/journal files SQLite creates
+/data/*.db
+/data/*.db-journal
+/data/*.db-shm
+/data/*.db-wal
+
+# Operating System specific files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Temporary files
+*~
+*.bak
+*.tmp
