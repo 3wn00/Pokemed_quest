@@ -21,7 +21,7 @@ public class TestProgressDao {
 
     // SQL query strings - Adjust table/column names as needed
     private static final String INSERT_PROGRESS_SQL = "INSERT INTO test_progress (user_id, test_timestamp, cmas_score) VALUES (?, ?, ?)";
-    private static final String SELECT_PROGRESS_BY_USER_SQL = "SELECT progress_id, user_id, test_timestamp, cmas_score FROM test_progress WHERE user_id = ORDER BY test_timestamp DESC"; // Order by most recent
+    private static final String SELECT_PROGRESS_BY_USER_SQL = "SELECT progress_id, user_id, test_timestamp, cmas_score FROM test_progress WHERE user_id = ? ORDER BY test_timestamp DESC"; // Order by most recent
     private static final String SELECT_PROGRESS_BY_ID_SQL = "SELECT progress_id, user_id, test_timestamp, cmas_score FROM test_progress WHERE progress_id = ?";
     // Add UPDATE and DELETE SQL statements later if needed
     // private static final String UPDATE_PROGRESS_SQL = "UPDATE test_progress SET user_id = ?, test_timestamp = ?, cmas_score = ? WHERE progress_id = ?";
