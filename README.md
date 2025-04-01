@@ -94,9 +94,9 @@ This section tracks the progress of the MVP development.
 
 ### Setup
 
-1.  **Clone the repository:** Replace `[Your Repository URL]` with the actual URL.
+1.  **Clone the repository:** Replace `[[Your Repository URL](https://github.com/3wn00/Pokemed_quest]` with the actual URL.
     ```bash
-    git clone [Your Repository URL]
+    git clone [https://github.com/3wn00/Pokemed_quest]
     cd PokeMed_Quest
     ```
 2.  **Add JDBC Driver:** Download the [SQLite JDBC driver](https://github.com/xerial/sqlite-jdbc/releases) JAR file and place it inside the `lib/` directory in the project root. **Make sure the filename matches the one specified in compile/run commands.**
