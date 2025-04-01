@@ -1,6 +1,6 @@
 package com.pokemedquest.dao;
 
-import com.pokemedquest.model.Avatar; // Import the Avatar model
+import com.pokemedquest.model.Avatar;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +12,7 @@ import java.util.Optional;
 /**
  * AvatarDao (Data Access Object) for Avatar entities.
  * Handles database operations related to Avatars.
- * Assuming one Avatar per User for simplicity in find/update methods for now.
+ * Assuming one Avatar per User for simplicity in find/update/delete methods for now.
  */
 public class AvatarDao {
 
@@ -20,8 +20,7 @@ public class AvatarDao {
     private static final String INSERT_AVATAR_SQL = "INSERT INTO avatars (user_id, avatar_name, color, accessory, level) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_AVATAR_BY_USER_SQL = "SELECT avatar_id, user_id, avatar_name, color, accessory, level FROM avatars WHERE user_id = ?";
     private static final String UPDATE_AVATAR_BY_USER_SQL = "UPDATE avatars SET avatar_name = ?, color = ?, accessory = ?, level = ? WHERE user_id = ?";
-    // Add DELETE statement if needed
-    // private static final String DELETE_AVATAR_BY_USER_SQL = "DELETE FROM avatars WHERE user_id = ?";
+    private static final String DELETE_AVATAR_BY_USER_SQL = "DELETE FROM avatars WHERE user_id = ?"; // Added
 
 
     /**
@@ -46,7 +45,7 @@ public class AvatarDao {
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        avatar.setAvatarId(generatedKeys.getInt(1)); // Set the generated ID
+                        avatar.setAvatarId(generatedKeys.getInt(1));
                         return true;
                     }
                 }
@@ -74,7 +73,6 @@ public class AvatarDao {
             try (ResultSet rs = preparedStatement.executeQuery()) {
                 if (rs.next()) {
                     int avatarId = rs.getInt("avatar_id");
-                    // userId is already known
                     String avatarName = rs.getString("avatar_name");
                     String color = rs.getString("color");
                     String accessory = rs.getString("accessory");
@@ -106,7 +104,7 @@ public class AvatarDao {
             preparedStatement.setInt(5, avatar.getUserId()); // Use userId in WHERE clause
 
             int affectedRows = preparedStatement.executeUpdate();
-            return affectedRows > 0; // Return true if at least one row was updated
+            return affectedRows > 0;
 
         } catch (SQLException e) {
             System.err.println("Error updating avatar by user ID: " + e.getMessage());
@@ -114,11 +112,25 @@ public class AvatarDao {
         return false;
     }
 
-    // --- TODO: Implement delete method if required ---
-    /*
+    /**
+     * Deletes the avatar associated with a specific user ID.
+     * Assumes a user has at most one avatar.
+     *
+     * @param userId The ID of the user whose avatar should be deleted.
+     * @return true if the deletion was successful (at least one row affected), false otherwise.
+     */
     public boolean deleteAvatarByUserId(int userId) {
-        // Implementation using DELETE_AVATAR_BY_USER_SQL
-        return false; // Placeholder
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_AVATAR_BY_USER_SQL)) {
+
+            preparedStatement.setInt(1, userId); // Use userId in WHERE clause
+
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error deleting avatar by user ID: " + e.getMessage());
+        }
+        return false;
     }
-    */
 }
