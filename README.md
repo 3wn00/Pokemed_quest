@@ -9,7 +9,7 @@
 
 ## Project Context
 
-This is a group project for the Software Engineering course (Block 3) at Zuyd Hogeschool. (Current Phase: MVP Implementation as of April 1, 2025, Landgraaf, NL).
+This is a group project for the Software Engineering course (Block 3) at Zuyd Hogeschool. (Current Phase: MVP Implementation as of April 1, 2025).
 
 ## Introduction
 
