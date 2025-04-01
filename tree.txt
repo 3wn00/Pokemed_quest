@@ -1,0 +1,68 @@
+C:.
+|   .gitignore
+|   README.md
+|
++---data
+|       application.db
+|
++---docs
+|   |   Project_Report.docx
+|   |   user_stories.md
+|   |
+|   \---diagrams
+|           class_diagram.png
+|
++---lib
+|       sqlite-jdbc-XYZ.jar
+|
++---src
+|   +---main
+|   |   +---java
+|   |   |   \---com
+|   |   |       \---pokemedquest
+|   |   |           |   Main.java
+|   |   |           |
+|   |   |           +---cli
+|   |   |           |       CliHandler.java
+|   |   |           |       MenuOptions.java
+|   |   |           |
+|   |   |           +---dao
+|   |   |           |       AvatarDao.java
+|   |   |           |       DatabaseManager.java
+|   |   |           |       ProgressDao.java
+|   |   |           |       UserDao.java
+|   |   |           |
+|   |   |           +---model
+|   |   |           |       Avatar.java
+|   |   |           |       TestProgress.java
+|   |   |           |       User.java
+|   |   |           |
+|   |   |           +---service
+|   |   |           |       AnomalyDetectionService.java
+|   |   |           |       AuthService.java
+|   |   |           |       AvatarService.java
+|   |   |           |       ProgressService.java
+|   |   |           |
+|   |   |           \---util
+|   |   |                   InputValidator.java
+|   |   |
+|   |   \---resources
+|   |           schema.sql
+|   |
+|   \---test
+|       +---java
+|       |   \---com
+|       |       \---pokemedquest
+|       |           +---dao
+|       |           |       UserDaoTest.java
+|       |           |
+|       |           \---service
+|       |                   AvatarServiceTest.java
+|       |
+|       \---resources
+|               test_data.sql
+|
+\---target
+    |   PokeMed_Quest.jar
+    |
+    \---classes
