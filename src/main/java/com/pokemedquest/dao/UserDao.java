@@ -1,15 +1,14 @@
 package com.pokemedquest.dao;
 
 import com.pokemedquest.model.User; // Import the User model
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList; // If you add a getAllUsers method
-import java.util.List;     // If you add a getAllUsers method
-import java.util.Optional; // Used for find methods that might not return a result
+import java.util.List;
+import java.util.Optional;
 
 /**
  * UserDao (Data Access Object) for User entities.
@@ -26,6 +25,60 @@ public class UserDao {
     // private static final String UPDATE_USER_SQL = "UPDATE users SET username = ?, password_hash = ?, role = ? WHERE id = ?";
     // private static final String DELETE_USER_SQL = "DELETE FROM users WHERE id = ?";
     // private static final String SELECT_ALL_USERS_SQL = "SELECT id, username, password_hash, role FROM users";
+    
+    private static final String DELETE_USER_BY_USERNAME_SQL = "DELETE FROM users WHERE username = ?";
+
+    public boolean deleteUserByUsername(String username) {
+        try (Connection connection = DatabaseManager.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_USER_BY_USERNAME_SQL)) {
+
+            // Set the username parameter
+            preparedStatement.setString(1, username);
+
+            // Execute the update and check if a row was affected
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0; // Return true if a user was deleted
+        } catch (SQLException e) {
+            System.err.println("Error deleting user by username: " + e.getMessage());
+            return false; // Return false if an error occurred
+        }
+    }
+
+
+    // SQL query strings - defined as constants
+    private static final String SELECT_ALL_USERS_SQL = "SELECT id, username, password_hash, role FROM users";
+
+    /**
+     * Retrieves all users from the database.
+     * @return A list of all users.
+     */
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS_SQL);
+             ResultSet rs = preparedStatement.executeQuery()) {
+
+            // Loop through the ResultSet and map each row to a User object
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String username = rs.getString("username");
+                String passwordHash = rs.getString("password_hash");
+                String role = rs.getString("role");
+
+                // Create a User object and add it to the list
+                User user = new User(id, username, passwordHash, role);
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving all users: " + e.getMessage());
+            // Handle exception appropriately
+        }
+
+        return users; // Return the list of users
+    }
+
+    // Other methods (createUser, findUserByUsername, findUserById, etc.) remain unchanged
 
 
     /**

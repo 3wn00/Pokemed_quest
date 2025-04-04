@@ -94,12 +94,15 @@ public class CliHandler {
         System.out.println("0. Logout");
     }
 
-     private void showAdminMenu() {
+    private void showAdminMenu() {
         System.out.println("--- Admin/Doctor Menu ---");
-        // Add admin specific options later
-        System.out.println("1. View Patient Progress (Example - Requires selecting patient)");
+        System.out.println("1. View Patient Progress");
+        System.out.println("2. Delete User Account");
+        System.out.println("3. List All Users");
+        System.out.println("4. View All Avatars");
+        System.out.println("5. View All Progress Records");
         System.out.println("0. Logout");
-     }
+    }
 
 
     // --- Input Helper Methods ---
@@ -135,6 +138,8 @@ public class CliHandler {
              System.out.println("Invalid role. Defaulting to 'child'.");
              role = "child";
         }
+
+        
 
 
         // !!! REMEMBER: Password should be HASHED by the service !!!
@@ -202,22 +207,97 @@ public class CliHandler {
         return true; // Keep running
     }
 
-     private boolean handleAdminChoice(int choice) {
-         switch(choice) {
-             case 1:
-                 System.out.println("Viewing Patient Progress (Not fully implemented)...");
-                 // TODO: Add logic to list patients, select one, view progress
-                 break;
-             case 0:
-                 handleLogout();
-                 return true; // Still running, just logged out
-             default:
-                 System.out.println("Invalid choice.");
-         }
+    private boolean handleAdminChoice(int choice) {
+        switch (choice) {
+            case 1:
+                handleViewPatientProgress();
+                break;
+            case 2:
+                handleDeleteUserAccount();
+                break;
+            case 3:
+                handleListAllUsers();
+                break;
+            case 4:
+                handleViewAllAvatars();
+                break;
+            case 5:
+                handleViewAllProgressRecords();
+                break;
+            case 0:
+                handleLogout();
+                return true; // Still running, just logged out
+            default:
+                System.out.println("Invalid choice.");
+        }
         return true; // Keep running
-     }
+    }
 
+    
 
+    private void handleViewPatientProgress() {
+        System.out.println("--- View Patient Progress ---");
+        String username = promptForString("Enter the username of the patient: ");
+        Optional<User> userOpt = authService.findUserByUsername(username); // Assuming this method exists in AuthService
+    
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            List<TestProgress> progressRecords = progressService.getProgressHistoryForUser(user.getId());
+            if (progressRecords.isEmpty()) {
+                System.out.println("No progress records found for this user.");
+            } else {
+                System.out.println("Date & Time        | Score");
+                System.out.println("-------------------|-------");
+                for (TestProgress progress : progressRecords) {
+                    System.out.printf("%-19s| %d%n",
+                            progress.getTestTimestamp().format(DTF),
+                            progress.getCmasScore());
+                }
+            }
+        } else {
+            System.out.println("User not found.");
+        }
+    }
+
+    private void handleDeleteUserAccount() {
+        System.out.println("--- Delete User Account ---");
+        String username = promptForString("Enter the username of the account to delete: ");
+        boolean success = authService.deleteUserByUsername(username); // Assuming this method exists in AuthService
+    
+        if (success) {
+            System.out.println("User account deleted successfully.");
+        } else {
+            System.out.println("Failed to delete user account (user may not exist).");
+        }
+    }
+
+    private void handleListAllUsers() {
+        System.out.println("--- List All Users ---");
+        List<User> users = authService.getAllUsers(); // Assuming this method exists in AuthService
+    
+        if (users.isEmpty()) {
+            System.out.println("No users found.");
+        } else {
+            System.out.println("Username | Role");
+            System.out.println("----------------");
+            for (User user : users) {
+                System.out.printf("%-8s | %s%n", user.getUsername(), user.getRole());
+            }
+        }
+    }
+
+    private void handleViewAllAvatars() {
+        System.out.println("--- View All Avatars ---");
+        List<Avatar> avatars = avatarService.getAllAvatars(); // Assuming this method exists in AvatarService
+    
+        if (avatars.isEmpty()) {
+            System.out.println("No avatars found.");
+        } else {
+            for (Avatar avatar : avatars) {
+                System.out.println(avatar); // Assuming Avatar has a meaningful toString() implementation
+            }
+        }
+    }
     // Child Action Handlers
     private void handleViewAvatar() {
         Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
@@ -231,6 +311,26 @@ public class CliHandler {
              // avatarService.createDefaultAvatar(currentUser, avatarName);
         }
     }
+
+    private void handleViewAllProgressRecords() {
+        System.out.println("--- View All Progress Records ---");
+        List<TestProgress> progressRecords = progressService.getAllProgressRecords(); // Assuming this method exists in ProgressService
+    
+        if (progressRecords.isEmpty()) {
+            System.out.println("No progress records found.");
+        } else {
+            System.out.println("User ID | Date & Time        | Score");
+            System.out.println("------------------------------------");
+            for (TestProgress progress : progressRecords) {
+                System.out.printf("%-7d | %-19s | %d%n",
+                        progress.getUserId(),
+                        progress.getTestTimestamp().format(DTF),
+                        progress.getCmasScore());
+            }
+        }
+    }
+
+    
 
     private void handleCustomizeAvatar() {
         System.out.println("--- Customize Avatar ---");

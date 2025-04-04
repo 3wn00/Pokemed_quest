@@ -4,6 +4,7 @@ import org.mindrot.jbcrypt.BCrypt; // Always use the jBCrypt class
 import com.pokemedquest.dao.UserDao;
 import com.pokemedquest.model.User;
 import java.util.Optional;
+import java.util.List;
 
 /**
  * AuthService provides authentication-related services like user registration and login.
@@ -20,6 +21,19 @@ public class AuthService {
     public AuthService(UserDao userDao) {
         this.userDao = userDao;
     }
+
+    public boolean deleteUserByUsername(String username) {
+        // Delegate the deletion to the UserDao
+        return userDao.deleteUserByUsername(username);
+    }
+   
+
+    public List<User> getAllUsers() {
+        // Assuming userDao has a method to retrieve all users
+        return userDao.getAllUsers();
+    }
+
+
 
     /**
      * Registers a new user.
