@@ -58,10 +58,10 @@ This section tracks the progress of the MVP development.
 * [x] MVP Feature: Basic Avatar Customization (name, color, accessory via CLI).
 * [x] MVP Feature: Record Test Progress (CMAS Score via CLI).
 * [x] MVP Feature: View Test Progress History (via CLI).
-
+* [X] **CRITICAL SECURITY:** Implement proper **Password Hashing** (e.g., BCrypt) in `AuthService` for registration and login verification.
 **Current / To-Do (`[ ]`):**
 
-* [ ] **CRITICAL SECURITY:** Implement proper **Password Hashing** (e.g., BCrypt) in `AuthService` for registration and login verification.
+
 * [ ] Code Review & Merge: Review the Pull Request containing the initial working code and merge it into the `develop` (or `main`) branch.
 * [ ] Expand CLI Features:
     * [ ] Implement Admin/Doctor menu options (e.g., view patient lists, view specific patient data).
