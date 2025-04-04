@@ -59,16 +59,19 @@ This section tracks the progress of the MVP development.
 * [x] MVP Feature: Record Test Progress (CMAS Score via CLI).
 * [x] MVP Feature: View Test Progress History (via CLI).
 * [X] **CRITICAL SECURITY:** Implement proper **Password Hashing** (e.g., BCrypt) in `AuthService` for registration and login verification.
-**Current / To-Do (`[ ]`):**
 
+**In Progress**
+* [ ] Expand CLI Features:
+    * [ ] Implement Admin/Doctor menu options (e.g., view patient lists, view specific patient data).
+* [ ] Refine DAO Layer: Implement `update`/`delete` methods in DAOs where necessary. (delete implemented via admin menu)
 
+**To-Do (`[ ]`):**
 * [ ] Code Review & Merge: Review the Pull Request containing the initial working code and merge it into the `develop` (or `main`) branch.
 * [ ] Expand CLI Features:
     * [ ] Implement Admin/Doctor menu options (e.g., view patient lists, view specific patient data).
     * [ ] Add more robust input validation and error handling in `CliHandler`.
     * [ ] Improve output formatting for better readability.
 * [ ] Implement Anomaly Finder Logic (basic version) in `ProgressService` and display results via CLI.
-* [ ] Refine DAO Layer: Implement `update`/`delete` methods in DAOs where necessary.
 * [ ] Testing:
     * [ ] Write Unit Tests (JUnit) for critical Service and DAO methods.
     * [ ] Perform thorough Manual Testing of all features and edge cases.
