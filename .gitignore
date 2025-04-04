@@ -5,7 +5,7 @@
 *.log
 
 # Package files (JARs are often built, not stored, unless they are libs)
-*.jar
+#*.jar
 *.war
 *.ear
 *.zip
