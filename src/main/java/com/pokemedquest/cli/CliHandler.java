@@ -91,6 +91,7 @@ public class CliHandler {
         System.out.println("3. Record CMAS Score");
         System.out.println("4. View My Progress History");
         System.out.println("5. Level Up Avatar (Test)"); // Example action
+        System.out.println("6. Check for Anomalies");
         System.out.println("0. Logout");
     }
 
@@ -98,6 +99,8 @@ public class CliHandler {
         System.out.println("--- Admin/Doctor Menu ---");
         // Add admin specific options later
         System.out.println("1. View Patient Progress (Example - Requires selecting patient)");
+        System.out.println("2. List All Patients");
+        System.out.println("3. View Specific Patient's Anomaly Report");
         System.out.println("0. Logout");
      }
 
@@ -130,10 +133,11 @@ public class CliHandler {
         String username = promptForString("Enter username: ");
         String password = promptForString("Enter password: ");
         // Simple role assignment for now, could be more complex
-        String role = promptForString("Enter role (child/admin): ").toLowerCase();
-        if (!role.equals("child") && !role.equals("admin")) {
-             System.out.println("Invalid role. Defaulting to 'child'.");
-             role = "child";
+        String role;
+        while (true) {
+            role = promptForString("Enter role (child/admin): ").toLowerCase();
+            if (role.equals("child") || role.equals("admin")) break;
+            System.out.println("Invalid role. Please enter 'child' or 'admin'.");
         }
 
 
@@ -193,6 +197,9 @@ public class CliHandler {
             case 5:
                 handleLevelUp(); // Example action
                 break;
+            case 6: 
+                handleCheckAnomalies(); // Example action
+                break;
             case 0:
                 handleLogout();
                 return true; // Still running, just logged out
@@ -207,6 +214,13 @@ public class CliHandler {
              case 1:
                  System.out.println("Viewing Patient Progress (Not fully implemented)...");
                  // TODO: Add logic to list patients, select one, view progress
+                 handleViewPatientProgress();
+                 break;
+             case 2:
+                 handleListAllPatients();
+                 break;
+             case 3:
+                 handleViewPatientAnomalies();
                  break;
              case 0:
                  handleLogout();
@@ -290,4 +304,63 @@ public class CliHandler {
         System.out.println("--- Attempting Level Up ---");
         avatarService.levelUpAvatar(currentUser.getId()); // Service method prints success/failure
      }
+
+     
+    private void handleCheckAnomalies() {
+        System.out.println("--- Anomaly Check ---");
+        List<String> anomalies = progressService.findPotentialAnomalies(currentUser.getId());
+
+        System.out.println("=== Anomaly Report for User ID: " + currentUser.getId() + " ===");
+        for (String msg : anomalies) {
+            System.out.println(msg);
+        }
+    }
+
+    private void handleListAllPatients() {
+        System.out.println("--- Patient List ---");
+        List<User> allUsers = authService.getAllUsers();
+
+        System.out.printf("%-5s| %-15s%n", "ID", "Username");
+        System.out.println("-------------------------");
+
+        for (User user : allUsers) {
+            if ("child".equalsIgnoreCase(user.getRole())) {
+                System.out.printf("%-5d| %-15s%n", user.getId(), user.getUsername());
+            }
+        }
+    }
+
+
+    private void handleViewPatientAnomalies() {
+        System.out.println("--- View Patient Anomaly Report ---");
+        int userId = promptForInt("Enter patient ID: ");
+        List<String> anomalies = progressService.findPotentialAnomalies(userId);
+
+        System.out.println("=== Anomaly Report for User ID: " + userId + " ===");
+        for (String msg : anomalies) {
+            System.out.println(msg);
+        }
+    }
+
+
+    private void handleViewPatientProgress() {
+        System.out.println("--- View Patient Progress ---");
+
+        int userId = promptForInt("Enter patient ID: ");
+
+        List<TestProgress> history = progressService.getProgressHistoryForUser(userId);
+        if (history.isEmpty()) {
+            System.out.println("No progress found for this user.");
+        } else {
+            System.out.println("Date & Time        | Score");
+            System.out.println("-------------------|-------");
+            for (TestProgress progress : history) {
+                System.out.printf("%-19s| %d%n",
+                        progress.getTestTimestamp().format(DTF),
+                        progress.getCmasScore());
+            }
+            System.out.println("---------------------------");
+        }
+    }
+
 }

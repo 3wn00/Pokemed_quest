@@ -3,6 +3,7 @@ package com.pokemedquest.service;
 import org.mindrot.jbcrypt.BCrypt; // Always use the jBCrypt class
 import com.pokemedquest.dao.UserDao;
 import com.pokemedquest.model.User;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -76,4 +77,9 @@ public class AuthService {
         // User not found OR password mismatch
         return Optional.empty();
     }
+    
+    public List<User> getAllUsers() {
+        return userDao.getAllUsers();
+    }
+
 }

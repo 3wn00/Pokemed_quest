@@ -82,5 +82,59 @@ public class ProgressService {
         return Collections.emptyList(); // Placeholder
     }
     */
+    /**
+     * Detects potential anomalies in a user's CMAS score history.
+     * Anomalies include sudden drops OR sudden improvements (30% change or more).
+     * @param userId The ID of the user.
+     * @return A list of descriptive anomaly messages.
+     * 
+     * A CMAS score is considered anomalous if it drops by more than 30% compared to the previous score for the same patient and exercise.
+     */
+    public List<String> findPotentialAnomalies(int userId) {
+        List<TestProgress> history = getProgressHistoryForUser(userId);
+        if (history.size() < 2) {
+            return Collections.singletonList("Not enough data to detect anomalies.");
+        }
 
+        Collections.reverse(history); // Make oldest first, newest last
+        List<String> anomalies = new java.util.ArrayList<>();
+
+        for (int i = 1; i < history.size(); i++) {
+            TestProgress prev = history.get(i - 1);
+            TestProgress curr = history.get(i);
+
+            int prevScore = prev.getCmasScore();
+            int currScore = curr.getCmasScore();
+
+            if (prevScore > 0) {
+                double change = (double)(currScore - prevScore) / prevScore;
+
+                if (change <= -0.3) {
+                    anomalies.add(String.format(
+                            "⚠️ Sudden drop: %d → %d between %s and %s (%.1f%% decrease)",
+                            prevScore,
+                            currScore,
+                            prev.getTestTimestamp(),
+                            curr.getTestTimestamp(),
+                            change * 100
+                    ));
+                } else if (change >= 0.3) {
+                    anomalies.add(String.format(
+                            "📈 Sudden improvement: %d → %d between %s and %s (%.1f%% increase)",
+                            prevScore,
+                            currScore,
+                            prev.getTestTimestamp(),
+                            curr.getTestTimestamp(),
+                            change * 100
+                    ));
+                }
+            }
+        }
+
+        if (anomalies.isEmpty()) {
+            anomalies.add("No anomalies or sudden changes detected.");
+        }
+
+        return anomalies;
+    }
 }
