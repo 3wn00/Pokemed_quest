@@ -62,7 +62,7 @@ This section tracks the progress of the MVP development.
 
 **In Progress**
 * [ ] Expand CLI Features:
-    * [ ] Implement Admin/Doctor menu options (e.g., view patient lists, view specific patient data).
+    * [ ] Implement Admin/Doctor menu options (e.g., view patient lists, view specific patient data). (view all users and delete users implemented, for the other functions waiting on finishing of other parts)
 * [ ] Refine DAO Layer: Implement `update`/`delete` methods in DAOs where necessary. (delete implemented via admin menu)
 
 **To-Do (`[ ]`):**
