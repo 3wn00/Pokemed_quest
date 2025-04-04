@@ -7,7 +7,7 @@ import com.pokemedquest.service.AuthService;
 import com.pokemedquest.service.AvatarService;
 import com.pokemedquest.service.ProgressService;
 import com.pokemedquest.cli.CliHandler; // Assuming CliHandler is in 'cli' subpackage
-
+// dwadawdaw
 import java.util.Scanner;
 
 /**
