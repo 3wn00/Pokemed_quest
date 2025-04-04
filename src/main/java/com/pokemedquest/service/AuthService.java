@@ -86,4 +86,28 @@ public class AuthService {
         // User not found OR password mismatch
         return Optional.empty();
     }
+
+        /**
+     * Allows an admin user to delete another user account.
+     * Includes a basic role check for permission.
+     *
+     * @param userIdToDelete The ID of the user account to be deleted.
+     * @param requestingAdmin The User object representing the admin performing the action.
+     * @return true if deletion was successful, false otherwise.
+     */
+    public boolean deleteUserAccount(int userIdToDelete, User requestingAdmin) {
+        // Optional: Add permission check - is requestingAdmin allowed to delete?
+        if (requestingAdmin != null && "admin".equalsIgnoreCase(requestingAdmin.getRole())) {
+            // Prevent admin from deleting themselves? (Optional check)
+            if (requestingAdmin.getId() == userIdToDelete) {
+                System.err.println("Admin cannot delete their own account through this method.");
+                return false;
+            }
+            System.out.println("Admin " + requestingAdmin.getUsername() + " attempting to delete user ID: " + userIdToDelete);
+            return userDao.deleteUser(userIdToDelete); // Call the DAO method added earlier
+        } else {
+            System.err.println("Permission denied for user deletion. Admin role required.");
+            return false;
+        }
+    }
 }

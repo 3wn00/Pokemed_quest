@@ -98,6 +98,10 @@ public class CliHandler {
         System.out.println("--- Admin/Doctor Menu ---");
         // Add admin specific options later
         System.out.println("1. View Patient Progress (Example - Requires selecting patient)");
+        System.out.println("2. Delete User Account"); // Deletion (admin only)
+        System.out.println("3. List All Users"); // List all users (admin only) not implemented
+        System.out.println("4. View All Avatars"); // List all avatars (admin only)
+        System.out.println("5. View All Progress Records"); // List all progress records (admin only)
         System.out.println("0. Logout");
      }
 
