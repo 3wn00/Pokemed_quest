@@ -10,6 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList; // If you add a getAllUsers method
 import java.util.List;     // If you add a getAllUsers method
 import java.util.Optional; // Used for find methods that might not return a result
+import com.pokemedquest.dao.DatabaseManager;
 
 /**
  * UserDao (Data Access Object) for User entities.

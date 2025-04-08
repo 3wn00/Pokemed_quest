@@ -1,4 +1,4 @@
-package com.pokemedquest; // Base package
+package com.pokemedquest;
 
 import com.pokemedquest.dao.AvatarDao;
 import com.pokemedquest.dao.TestProgressDao;
@@ -6,7 +6,7 @@ import com.pokemedquest.dao.UserDao;
 import com.pokemedquest.service.AuthService;
 import com.pokemedquest.service.AvatarService;
 import com.pokemedquest.service.ProgressService;
-import com.pokemedquest.cli.CliHandler; // Assuming CliHandler is in 'cli' subpackage
+import com.pokemedquest.cli.CliHandler;
 
 import java.util.Scanner;
 
@@ -28,8 +28,8 @@ public class Main {
         TestProgressDao testProgressDao = new TestProgressDao();
 
         // 2. Create Service instances, injecting DAOs
-        AuthService authService = new AuthService(userDao);
-        AvatarService avatarService = new AvatarService(avatarDao);
+        AvatarService avatarService = new AvatarService(avatarDao); // Initialize avatarService first
+        AuthService authService = new AuthService(userDao, avatarService); // Now pass avatarService
         ProgressService progressService = new ProgressService(testProgressDao);
 
         // 3. Create Scanner for user input

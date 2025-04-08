@@ -1,5 +1,7 @@
 package com.pokemedquest.model;
 
+import com.pokemedquest.util.AsciiArtLoader; // Import the utility class
+
 /**
  * Represents a customizable Avatar linked to a User in PokeMed_Quest.
  */
@@ -12,6 +14,9 @@ public class Avatar {
     private String color;      // Example customization: color attribute
     private String accessory;  // Example customization: accessory attribute
     private int level;         // Example gamification: avatar level
+
+    // New field for ASCII art file path
+    private String asciiArtPath;
 
     // --- Constructors ---
 
@@ -32,6 +37,7 @@ public class Avatar {
         this.color = color;
         this.accessory = accessory;
         this.level = level;
+        this.asciiArtPath = determineAsciiArtPath(avatarName, level); // Dynamically set ASCII art path
     }
 
     /**
@@ -51,6 +57,91 @@ public class Avatar {
         this.color = color;
         this.accessory = accessory;
         this.level = level;
+        this.asciiArtPath = determineAsciiArtPath(avatarName, level); // Dynamically set ASCII art path
+    }
+
+    // --- New Methods ---
+
+    /**
+     * Dynamically determines the ASCII art file path based on the avatar's name and level.
+     *
+     * @param avatarName The name of the avatar (e.g., Warrior, Mage, Archer).
+     * @param level The current level of the avatar.
+     * @return The file path for the corresponding ASCII art.
+     */
+    private String determineAsciiArtPath(String avatarName, int level) {
+        String basePath = "src/main/resources/ascii_art/";
+        String fileName;
+    
+        // Debugging: Print the inputs
+        System.out.println("Determining ASCII art path...");
+        System.out.println("Avatar Name: " + avatarName);
+        System.out.println("Level: " + level);
+        System.out.println("Accessory: " + this.accessory);
+    
+        // Determine the base file name based on the avatar's name and level
+        switch (avatarName.toLowerCase()) {
+            case "warrior":
+                fileName = "avatar1_default";
+                break;
+            case "mage":
+                fileName = "avatar2_default";
+                break;
+            case "archer":
+                fileName = "avatar3_default";
+                break;
+            default:
+                fileName = "avatar1_default"; // Default to Warrior if no match
+        }
+    
+        // Adjust file name for evolutions based on level
+        if (level >= 5 && level < 10) {
+            fileName = fileName.replace("default", "evolved1");
+        } else if (level >= 10) {
+            fileName = fileName.replace("default", "evolved2");
+        }
+    
+        // Add the accessory to the file name if applicable
+        if (this.accessory != null && !"none".equalsIgnoreCase(this.accessory)) {
+            fileName += "_" + this.accessory;
+        }
+    
+        // Add the file extension
+        fileName += ".txt";
+    
+        // Debugging: Print the final file name
+        System.out.println("Determined ASCII art file: " + fileName);
+    
+        return basePath + fileName;
+    }
+
+    /**
+     * Displays the ASCII art for the avatar.
+     */
+    public void displayAsciiArt() {
+        // Debugging: Print the ASCII art path being used
+        System.out.println("Displaying ASCII art from: " + asciiArtPath);
+    
+        // Load and display the ASCII art
+        System.out.println(AsciiArtLoader.loadAsciiArt(asciiArtPath));
+    }
+
+    /**
+     * Updates the ASCII art file path.
+     *
+     * @param asciiArtPath The new file path for the ASCII art.
+     */
+    public void setAsciiArtPath(String asciiArtPath) {
+        this.asciiArtPath = asciiArtPath;
+    }
+
+    /**
+     * Retrieves the current ASCII art file path.
+     *
+     * @return The file path of the ASCII art.
+     */
+    public String getAsciiArtPath() {
+        return asciiArtPath;
     }
 
     // --- Getters and Setters ---
@@ -77,6 +168,7 @@ public class Avatar {
 
     public void setAvatarName(String avatarName) {
         this.avatarName = avatarName;
+        this.asciiArtPath = determineAsciiArtPath(avatarName, this.level); // Update ASCII art path
     }
 
     public String getColor() {
@@ -93,6 +185,12 @@ public class Avatar {
 
     public void setAccessory(String accessory) {
         this.accessory = accessory;
+    
+        // Dynamically update the ASCII art path
+        this.asciiArtPath = determineAsciiArtPath(this.avatarName, this.level);
+    
+        // Debugging: Print the updated ASCII art path
+        System.out.println("Updated ASCII art path: " + this.asciiArtPath);
     }
 
     public int getLevel() {
@@ -101,6 +199,7 @@ public class Avatar {
 
     public void setLevel(int level) {
         this.level = level;
+        this.asciiArtPath = determineAsciiArtPath(this.avatarName, level); // Update ASCII art path
     }
 
     // --- Optional: toString() method for debugging ---
@@ -108,11 +207,12 @@ public class Avatar {
     public String toString() {
         return "Avatar{" +
                "avatarId=" + avatarId +
-               ", userId=" + userId + // Included here for context during debugging
+               ", userId=" + userId +
                ", avatarName='" + avatarName + '\'' +
                ", color='" + color + '\'' +
                ", accessory='" + accessory + '\'' +
                ", level=" + level +
+               ", asciiArtPath='" + asciiArtPath + '\'' +
                '}';
     }
 }

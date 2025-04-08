@@ -12,6 +12,7 @@ import java.time.LocalDateTime; // Used in the model
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import com.pokemedquest.dao.DatabaseManager;
 
 /**
  * TestProgressDao (Data Access Object) for TestProgress entities.

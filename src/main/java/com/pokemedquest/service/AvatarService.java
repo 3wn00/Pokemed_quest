@@ -2,7 +2,7 @@ package com.pokemedquest.service;
 
 import com.pokemedquest.dao.AvatarDao;
 import com.pokemedquest.model.Avatar;
-import com.pokemedquest.model.User; // May be needed for context
+import com.pokemedquest.model.User;
 
 import java.util.Optional;
 
@@ -28,16 +28,21 @@ public class AvatarService {
      * @return An Optional containing the created Avatar (with ID) if successful, empty otherwise.
      */
     public Optional<Avatar> createDefaultAvatar(User user, String avatarName) {
-        // Define default values
+        // Check if the user already has an avatar
+        if (avatarDao.findAvatarByUserId(user.getId()).isPresent()) {
+            System.err.println("User already has an avatar. Cannot create a new one.");
+            return Optional.empty();
+        }
+    
+        // Define default attributes for the avatar
         String defaultColor = "blue";
         String defaultAccessory = "none";
         int defaultLevel = 1;
-
+    
         Avatar newAvatar = new Avatar(user.getId(), avatarName, defaultColor, defaultAccessory, defaultLevel);
         boolean success = avatarDao.createAvatar(newAvatar);
-
+    
         if (success) {
-            // newAvatar object should have its ID set by createAvatar
             return Optional.of(newAvatar);
         } else {
             System.err.println("Failed to create default avatar for user ID: " + user.getId());
@@ -46,11 +51,37 @@ public class AvatarService {
     }
 
     /**
+     * Creates a new avatar and stores it in the database.
+     *
+     * @param avatar The avatar to create.
+     * @return true if the avatar was successfully created, false otherwise.
+     */
+    public boolean createAvatar(Avatar avatar) {
+        boolean success = avatarDao.createAvatar(avatar);
+        if (success) {
+            System.out.println("Avatar created for user ID: " + avatar.getUserId());
+        } else {
+            System.err.println("Failed to create avatar for user ID: " + avatar.getUserId());
+        }
+        return success;
+    }
+
+    /**
      * Retrieves the avatar for a specific user.
      * @param userId The ID of the user.
      * @return An Optional containing the Avatar if found, empty otherwise.
      */
     public Optional<Avatar> getAvatarForUser(int userId) {
+        return avatarDao.findAvatarByUserId(userId);
+    }
+
+    /**
+     * Retrieves an avatar by user ID.
+     *
+     * @param userId The ID of the user whose avatar is being retrieved.
+     * @return An Optional containing the Avatar if found, otherwise empty.
+     */
+    public Optional<Avatar> getAvatarByUserId(int userId) {
         return avatarDao.findAvatarByUserId(userId);
     }
 
@@ -66,10 +97,24 @@ public class AvatarService {
         Optional<Avatar> avatarOpt = avatarDao.findAvatarByUserId(userId);
         if (avatarOpt.isPresent()) {
             Avatar avatar = avatarOpt.get();
-            // Update fields
             avatar.setAvatarName(newName);
             avatar.setColor(newColor);
-            avatar.setAccessory(newAccessory);
+    
+            // Update accessory and dynamically adjust ASCII art path
+            String basePath = "src/main/resources/ascii_art/";
+            String fileName = avatar.getAsciiArtPath();
+    
+            if (!"none".equals(newAccessory)) {
+                // Add the new accessory to the file name
+                fileName = fileName.replace(".txt", "_" + newAccessory + ".txt");
+            } else {
+                // Remove the existing accessory from the file name
+                fileName = fileName.replace("_" + avatar.getAccessory() + ".txt", ".txt");
+            }
+    
+            avatar.setAccessory(newAccessory); // Update the accessory
+            avatar.setAsciiArtPath(basePath + fileName); // Update the ASCII art path
+    
             // Update in the database
             return avatarDao.updateAvatarByUserId(avatar);
         } else {
