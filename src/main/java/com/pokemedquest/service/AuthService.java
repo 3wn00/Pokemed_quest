@@ -1,8 +1,10 @@
 package com.pokemedquest.service;
 
-import org.mindrot.jbcrypt.BCrypt; // Always use the jBCrypt class
+import org.mindrot.jbcrypt.BCrypt;
 import com.pokemedquest.dao.UserDao;
 import com.pokemedquest.model.User;
+import com.pokemedquest.model.Avatar;
+
 import java.util.Optional;
 
 /**
@@ -11,19 +13,22 @@ import java.util.Optional;
 public class AuthService {
 
     private final UserDao userDao;
+    private final AvatarService avatarService; // Add AvatarService dependency
 
     /**
      * Constructor for dependency injection.
-     * Requires a UserDao instance to interact with the database.
+     * Requires a UserDao and AvatarService instance to interact with the database.
+     *
      * @param userDao The UserDao instance.
+     * @param avatarService The AvatarService instance.
      */
-    public AuthService(UserDao userDao) {
+    public AuthService(UserDao userDao, AvatarService avatarService) {
         this.userDao = userDao;
+        this.avatarService = avatarService;
     }
 
     /**
-     * Registers a new user.
-     * NOTE: Password hashing MUST be implemented here in a real application.
+     * Registers a new user and creates a default avatar for them.
      *
      * @param username The desired username.
      * @param plainPassword The user's chosen plain text password.
@@ -32,29 +37,25 @@ public class AuthService {
      * otherwise an empty Optional.
      */
     public Optional<User> registerUser(String username, String plainPassword, String role) {
-        // Use BCrypt from jBCrypt to hash the password
         String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
-
-        // Check if username already exists (optional, depends on DB constraints)
+    
         if (userDao.findUserByUsername(username).isPresent()) {
             System.err.println("Username '" + username + "' already exists.");
-            return Optional.empty(); // Username taken
+            return Optional.empty();
         }
-
+    
         User newUser = new User(username, hashedPassword, role);
         boolean success = userDao.createUser(newUser);
-
+    
         if (success) {
-            // The newUser object should now have its ID set by the createUser method
             return Optional.of(newUser);
         } else {
-            return Optional.empty(); // Registration failed
+            return Optional.empty();
         }
     }
 
     /**
      * Attempts to log in a user.
-     * NOTE: Password verification MUST use a proper hashing check in a real application.
      *
      * @param username The username attempting to log in.
      * @param plainPassword The plain text password entered by the user.
@@ -67,13 +68,15 @@ public class AuthService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
-            // Use BCrypt to verify the hashed password
             if (BCrypt.checkpw(plainPassword, user.getPasswordHash())) {
-                return Optional.of(user); // Login successful
+                // Optionally, retrieve the user's avatar
+                Optional<Avatar> avatarOptional = avatarService.getAvatarByUserId(user.getId());
+                avatarOptional.ifPresent(avatar -> System.out.println("Welcome back, " + avatar.getAvatarName() + "!"));
+
+                return Optional.of(user);
             }
         }
 
-        // User not found OR password mismatch
         return Optional.empty();
     }
 }

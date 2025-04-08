@@ -1,5 +1,6 @@
 package com.pokemedquest.dao;
 
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -44,26 +45,10 @@ public class DatabaseManager {
             throw new SQLException("Database driver not found", e);
         }
 
+        // Debugging: Print the absolute path of the database file
+        System.out.println("Using database file: " + Paths.get("data/application.db").toAbsolutePath());
+
         // Attempt to establish the connection using the DB URL
         return DriverManager.getConnection(DB_URL);
     }
-
-    /*
-     * NOTE ON CLOSING CONNECTIONS:
-     * This class only *provides* connections. The code that *uses* the connection
-     * (typically the methods within your DAO classes like UserDao, AvatarDao, etc.)
-     * MUST ensure the connection is closed properly after use to release database
-     * resources. The recommended way to do this is using a try-with-resources statement:
-     *
-     * try (Connection conn = DatabaseManager.getConnection();
-     * Statement stmt = conn.createStatement()) { // Or PreparedStatement
-     *
-     * // ... use the connection (stmt.executeQuery(), stmt.executeUpdate(), etc.) ...
-     *
-     * } catch (SQLException e) {
-     * // Handle exceptions
-     * e.printStackTrace();
-     * }
-     * // Connection and Statement will be automatically closed here, even if exceptions occur.
-     */
 }

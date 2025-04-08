@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
+import com.pokemedquest.dao.DatabaseManager;
 
 /**
  * AvatarDao (Data Access Object) for Avatar entities.
@@ -19,7 +20,7 @@ public class AvatarDao {
     // SQL query strings - Adjust table/column names as needed
     private static final String INSERT_AVATAR_SQL = "INSERT INTO avatars (user_id, avatar_name, color, accessory, level) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_AVATAR_BY_USER_SQL = "SELECT avatar_id, user_id, avatar_name, color, accessory, level FROM avatars WHERE user_id = ?";
-    private static final String UPDATE_AVATAR_BY_USER_SQL = "UPDATE avatars SET avatar_name = ?, color = ?, accessory = ?, level = ? WHERE user_id = ?";
+    private static final String UPDATE_AVATAR_BY_USER_SQL = "UPDATE avatars SET avatar_name = ?, color = ?, accessory = ?, level = ?, ascii_art_path = ? WHERE user_id = ?";
     // Add DELETE statement if needed
     // private static final String DELETE_AVATAR_BY_USER_SQL = "DELETE FROM avatars WHERE user_id = ?";
 
@@ -96,24 +97,34 @@ public class AvatarDao {
      * @return true if the update was successful (at least one row affected), false otherwise.
      */
     public boolean updateAvatarByUserId(Avatar avatar) {
-        try (Connection connection = DatabaseManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_AVATAR_BY_USER_SQL)) {
-
-            preparedStatement.setString(1, avatar.getAvatarName());
-            preparedStatement.setString(2, avatar.getColor());
-            preparedStatement.setString(3, avatar.getAccessory());
-            preparedStatement.setInt(4, avatar.getLevel());
-            preparedStatement.setInt(5, avatar.getUserId()); // Use userId in WHERE clause
-
-            int affectedRows = preparedStatement.executeUpdate();
-            return affectedRows > 0; // Return true if at least one row was updated
-
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(UPDATE_AVATAR_BY_USER_SQL)) { // Use the updated query
+    
+            // Set parameters
+            stmt.setString(1, avatar.getAvatarName());
+            stmt.setString(2, avatar.getColor());
+            stmt.setString(3, avatar.getAccessory());
+            stmt.setInt(4, avatar.getLevel());
+            stmt.setString(5, avatar.getAsciiArtPath()); // Bind ascii_art_path
+            stmt.setInt(6, avatar.getUserId()); // Bind user_id
+    
+            // Debugging: Print the values being updated
+            System.out.println("Updating avatar in database:");
+            System.out.println("Name: " + avatar.getAvatarName());
+            System.out.println("Color: " + avatar.getColor());
+            System.out.println("Accessory: " + avatar.getAccessory());
+            System.out.println("Level: " + avatar.getLevel());
+            System.out.println("ASCII Art Path: " + avatar.getAsciiArtPath());
+            System.out.println("User ID: " + avatar.getUserId());
+    
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0; // Return true if at least one row was updated
         } catch (SQLException e) {
-            System.err.println("Error updating avatar by user ID: " + e.getMessage());
+            System.err.println("Error updating avatar in database: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
-
     // --- TODO: Implement delete method if required ---
     /*
     public boolean deleteAvatarByUserId(int userId) {
