@@ -6,6 +6,7 @@ import com.pokemedquest.model.User;
 import com.pokemedquest.model.Avatar;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * AuthService provides authentication-related services like user registration and login.
@@ -26,6 +27,19 @@ public class AuthService {
         this.userDao = userDao;
         this.avatarService = avatarService;
     }
+
+    public boolean deleteUserByUsername(String username) {
+        // Delegate the deletion to the UserDao
+        return userDao.deleteUserByUsername(username);
+    }
+   
+
+    public List<User> getAllUsers() {
+        // Assuming userDao has a method to retrieve all users
+        return userDao.getAllUsers();
+    }
+
+
 
     /**
      * Registers a new user and creates a default avatar for them.
@@ -55,28 +69,28 @@ public class AuthService {
     }
 
     /**
- * Attempts to log in a user.
- *
- * @param username The username attempting to log in.
- * @param plainPassword The plain text password entered by the user.
- * @return An Optional containing the User object if login is successful,
- * otherwise an empty Optional.
- */
-public Optional<User> loginUser(String username, String plainPassword) {
-    Optional<User> userOptional = userDao.findUserByUsername(username);
+     * Attempts to log in a user.
+     *
+     * @param username The username attempting to log in.
+     * @param plainPassword The plain text password entered by the user.
+     * @return An Optional containing the User object if login is successful,
+     * otherwise an empty Optional.
+     */
+    public Optional<User> loginUser(String username, String plainPassword) {
+        Optional<User> userOptional = userDao.findUserByUsername(username);
 
-    if (userOptional.isPresent()) {
-        User user = userOptional.get();
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
 
-        if (BCrypt.checkpw(plainPassword, user.getPasswordHash())) {
-            // Retrieve the user's avatar using the updated method
-            Optional<Avatar> avatarOptional = avatarService.getAvatarForUser(user.getId());
-            avatarOptional.ifPresent(avatar -> System.out.println("Welcome back, " + avatar.getAvatarName() + "!"));
+            if (BCrypt.checkpw(plainPassword, user.getPasswordHash())) {
+                // Optionally, retrieve the user's avatar
+                Optional<Avatar> avatarOptional = avatarService.getAvatarByUserId(user.getId());
+                avatarOptional.ifPresent(avatar -> System.out.println("Welcome back, " + avatar.getAvatarName() + "!"));
 
-            return Optional.of(user);
+                return Optional.of(user);
+            }
         }
-    }
 
-    return Optional.empty();
-}
+        return Optional.empty();
+    }
 }
