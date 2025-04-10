@@ -6,7 +6,6 @@ import com.pokemedquest.model.User;
 import com.pokemedquest.service.AuthService;
 import com.pokemedquest.service.AvatarService;
 import com.pokemedquest.service.ProgressService;
-import com.pokemedquest.util.AnsiColor;
 
 import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
@@ -29,6 +28,7 @@ public class CliHandler {
     // Formatter for displaying dates/times nicely
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
+
     public CliHandler(Scanner scanner, AuthService authService, AvatarService avatarService, ProgressService progressService) {
         this.scanner = scanner;
         this.authService = authService;
@@ -44,7 +44,7 @@ public class CliHandler {
         while (running) {
             if (currentUser == null) {
                 showMainMenu();
-                int choice = promptForInt(AnsiColor.CYAN + "Enter choice: " + AnsiColor.RESET);
+                int choice = promptForInt("Enter choice: ");
                 switch (choice) {
                     case 1:
                         handleLogin();
@@ -56,18 +56,18 @@ public class CliHandler {
                         running = false;
                         break;
                     default:
-                        System.out.println(AnsiColor.RED + "Invalid choice. Please try again." + AnsiColor.RESET);
+                        System.out.println("Invalid choice. Please try again.");
                 }
             } else {
                 // User is logged in - show appropriate menu
-                System.out.println(AnsiColor.BRIGHT_YELLOW + "\n--- Logged in as: " + currentUser.getUsername() + " (" + currentUser.getRole() + ") ---" + AnsiColor.RESET);
+                System.out.println("\n--- Logged in as: " + currentUser.getUsername() + " (" + currentUser.getRole() + ") ---");
                 if ("child".equalsIgnoreCase(currentUser.getRole())) {
                     showChildMenu();
-                    int choice = promptForInt(AnsiColor.CYAN + "Enter choice: " + AnsiColor.RESET);
+                    int choice = promptForInt("Enter choice: ");
                     running = handleChildChoice(choice); // handleChildChoice returns false if user logs out/exits
                 } else { // Assume "admin" or "doctor" role
                     showAdminMenu();
-                    int choice = promptForInt(AnsiColor.CYAN + "Enter choice: " + AnsiColor.RESET);
+                    int choice = promptForInt("Enter choice: ");
                     running = handleAdminChoice(choice); // handleAdminChoice returns false if user logs out/exits
                 }
             }
@@ -75,33 +75,35 @@ public class CliHandler {
         }
     }
 
-
     // --- Menu Display Methods ---
 
     private void showMainMenu() {
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "--- Main Menu ---" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_GREEN + "1. Login" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_BLUE + "2. Register" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_RED + "0. Exit" + AnsiColor.RESET);
+        System.out.println("--- Main Menu ---");
+        System.out.println("1. Login");
+        System.out.println("2. Register");
+        System.out.println("0. Exit");
     }
 
     private void showChildMenu() {
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "--- Child Menu ---" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_GREEN + "1. View My Avatar" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_BLUE + "2. Customize Avatar" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_PURPLE + "3. Record CMAS Score" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_CYAN + "4. View My Progress History" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "5. Level Up Avatar (Test)" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_GREEN + "6. View Avatar ASCII Art" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_RED + "0. Logout" + AnsiColor.RESET);
+        System.out.println("--- Child Menu ---");
+        System.out.println("1. View My Avatar");
+        System.out.println("2. Customize Avatar");
+        System.out.println("3. Record CMAS Score");
+        System.out.println("4. View My Progress History");
+        System.out.println("5. Level Up Avatar (Test)"); // Example action
+        System.out.println("6. View Avatar ASCII Art"); // New option
+        System.out.println("0. Logout");
     }
 
     private void showAdminMenu() {
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "--- Admin/Doctor Menu ---" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_GREEN + "1. View Patient Progress (Example - Requires selecting patient)" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_RED + "0. Logout" + AnsiColor.RESET);
+        System.out.println("--- Admin/Doctor Menu ---");
+        System.out.println("1. View Patient Progress");
+        System.out.println("2. Delete User Account");
+        System.out.println("3. List All Users");
+        System.out.println("4. View All Avatars");
+        System.out.println("5. View All Progress Records");
+        System.out.println("0. Logout");
     }
-
 
 
     // --- Input Helper Methods ---
@@ -119,7 +121,7 @@ public class CliHandler {
                 scanner.nextLine(); // Consume the leftover newline character
                 return value;
             } catch (InputMismatchException e) {
-                System.out.println(AnsiColor.RED + "Invalid input. Please enter a number." + AnsiColor.RESET);
+                System.out.println("Invalid input. Please enter a number.");
                 scanner.nextLine(); // Consume the invalid input
             }
         }
@@ -138,6 +140,8 @@ public class CliHandler {
             role = "child";
         }
     
+        
+
         Optional<User> registeredUser = authService.registerUser(username, password, role);
     
         if (registeredUser.isPresent()) {
@@ -213,7 +217,6 @@ public class CliHandler {
 
 
     private boolean handleChildChoice(int choice) {
-        System.out.println("DEBUG: Child menu choice selected: " + choice); // Debug log
         switch (choice) {
             case 1:
                 handleViewAvatar();
@@ -228,36 +231,111 @@ public class CliHandler {
                 handleViewHistory();
                 break;
             case 5:
-                handleLevelUp();
+                handleLevelUp(); // Example action
                 break;
             case 6:
-                handleViewAvatarAsciiArt(); // Handle option 6
+                handleViewAvatarAsciiArt(); // New action
+            break;
+            case 0:
+                handleLogout();
+                return true; // Still running, just logged out
+            default:
+                System.out.println("Invalid choice.");
+        }
+        return true; // Keep running
+    }
+
+    private boolean handleAdminChoice(int choice) {
+        switch (choice) {
+            case 1:
+                handleViewPatientProgress();
+                break;
+            case 2:
+                handleDeleteUserAccount();
+                break;
+            case 3:
+                handleListAllUsers();
+                break;
+            case 4:
+                handleViewAllAvatars();
+                break;
+            case 5:
+                handleViewAllProgressRecords();
                 break;
             case 0:
                 handleLogout();
                 return true; // Still running, just logged out
             default:
-                System.out.println(AnsiColor.RED + "Invalid choice. Please try again." + AnsiColor.RESET);
+                System.out.println("Invalid choice.");
         }
         return true; // Keep running
     }
 
-     private boolean handleAdminChoice(int choice) {
-         switch(choice) {
-             case 1:
-                 System.out.println("Viewing Patient Progress (Not fully implemented)...");
-                 // TODO: Add logic to list patients, select one, view progress
-                 break;
-             case 0:
-                 handleLogout();
-                 return true; // Still running, just logged out
-             default:
-                 System.out.println("Invalid choice.");
-         }
-        return true; // Keep running
-     }
+    
 
+    private void handleViewPatientProgress() {
+        System.out.println("--- View Patient Progress ---");
+        String username = promptForString("Enter the username of the patient: ");
+        Optional<User> userOpt = authService.findUserByUsername(username); // Assuming this method exists in AuthService
+    
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            List<TestProgress> progressRecords = progressService.getProgressHistoryForUser(user.getId());
+            if (progressRecords.isEmpty()) {
+                System.out.println("No progress records found for this user.");
+            } else {
+                System.out.println("Date & Time        | Score");
+                System.out.println("-------------------|-------");
+                for (TestProgress progress : progressRecords) {
+                    System.out.printf("%-19s| %d%n",
+                            progress.getTestTimestamp().format(DTF),
+                            progress.getCmasScore());
+                }
+            }
+        } else {
+            System.out.println("User not found.");
+        }
+    }
 
+    private void handleDeleteUserAccount() {
+        System.out.println("--- Delete User Account ---");
+        String username = promptForString("Enter the username of the account to delete: ");
+        boolean success = authService.deleteUserByUsername(username); // Assuming this method exists in AuthService
+    
+        if (success) {
+            System.out.println("User account deleted successfully.");
+        } else {
+            System.out.println("Failed to delete user account (user may not exist).");
+        }
+    }
+
+    private void handleListAllUsers() {
+        System.out.println("--- List All Users ---");
+        List<User> users = authService.getAllUsers(); // Assuming this method exists in AuthService
+    
+        if (users.isEmpty()) {
+            System.out.println("No users found.");
+        } else {
+            System.out.println("Username | Role");
+            System.out.println("----------------");
+            for (User user : users) {
+                System.out.printf("%-8s | %s%n", user.getUsername(), user.getRole());
+            }
+        }
+    }
+
+    private void handleViewAllAvatars() {
+        System.out.println("--- View All Avatars ---");
+        List<Avatar> avatars = avatarService.getAllAvatars(); // Assuming this method exists in AvatarService
+    
+        if (avatars.isEmpty()) {
+            System.out.println("No avatars found.");
+        } else {
+            for (Avatar avatar : avatars) {
+                System.out.println(avatar); // Assuming Avatar has a meaningful toString() implementation
+            }
+        }
+    }
     // Child Action Handlers
     private void handleViewAvatar() {
         Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
@@ -272,125 +350,149 @@ public class CliHandler {
         }
     }
 
-    private void handleViewAvatarAsciiArt() {
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "--- View Avatar ASCII Art ---" + AnsiColor.RESET);
+    private void handleViewAllProgressRecords() {
+        System.out.println("--- View All Progress Records ---");
+        List<TestProgress> progressRecords = progressService.getAllProgressRecords(); // Assuming this method exists in ProgressService
     
-        // Retrieve the avatar for the current user
-        Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
-        if (avatarOpt.isPresent()) {
-            Avatar avatar = avatarOpt.get();
-    
-            // Debugging: Log avatar details
-            System.out.println("DEBUG: Retrieved avatar - Name: " + avatar.getAvatarName() +
-                               ", Level: " + avatar.getLevel() +
-                               ", Color: " + avatar.getColor() +
-                               ", Accessory: " + avatar.getAccessory());
-    
-            // Display the ASCII art
-            avatarService.displayAvatarAsciiArt(avatar);
+        if (progressRecords.isEmpty()) {
+            System.out.println("No progress records found.");
         } else {
-            System.out.println(AnsiColor.RED + "You don't seem to have an avatar yet." + AnsiColor.RESET);
+            System.out.println("User ID | Date & Time        | Score");
+            System.out.println("------------------------------------");
+            for (TestProgress progress : progressRecords) {
+                System.out.printf("%-7d | %-19s | %d%n",
+                        progress.getUserId(),
+                        progress.getTestTimestamp().format(DTF),
+                        progress.getCmasScore());
+            }
         }
     }
 
-    private void handleCustomizeAvatar() {
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "--- Customize Avatar ---" + AnsiColor.RESET);
-        Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
-        if (!avatarOpt.isPresent()) {
-            System.out.println(AnsiColor.RED + "You need an avatar first!" + AnsiColor.RESET);
-            return;
-        }
+        /**
+ * Handles viewing the avatar's ASCII art.
+ */
+private void handleViewAvatarAsciiArt() {
+    Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
+    if (avatarOpt.isPresent()) {
+        System.out.println("--- Avatar ASCII Art ---");
+        avatarOpt.get().displayAsciiArt(); // Display the ASCII art
+    } else {
+        System.out.println("You don't seem to have an avatar yet.");
+    }
+}
+
+    /**
+ * Handles customizing the avatar.
+ */
+private void handleCustomizeAvatar() {
+    System.out.println("--- Customize Avatar ---");
+    Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
+    if (!avatarOpt.isPresent()) {
+        System.out.println("You need an avatar first!");
+        return;
+    }
     
-        Avatar avatar = avatarOpt.get();
+
+    private void handleViewAllProgressRecords() {
+        System.out.println("--- View All Progress Records ---");
+        List<TestProgress> progressRecords = progressService.getAllProgressRecords(); // Assuming this method exists in ProgressService
     
-        System.out.println(AnsiColor.BRIGHT_GREEN + "Current Avatar Details:" + AnsiColor.RESET);
-        avatarService.displayAvatarAsciiArt(avatar);
-    
-        System.out.println(AnsiColor.BRIGHT_BLUE + "Choose an option to customize:" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_GREEN + "1. Change Avatar Name" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_BLUE + "2. Change Avatar Color" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_PURPLE + "3. Add/Change Cosmetic" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_RED + "4. Remove Cosmetic" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "0. Cancel" + AnsiColor.RESET);
-    
-        int choice = promptForInt(AnsiColor.CYAN + "Enter your choice (0-4): " + AnsiColor.RESET);
-    
-        switch (choice) {
-            case 1 -> {
-                String newName = promptForString(AnsiColor.CYAN + "Enter new avatar name (" + avatar.getAvatarName() + "): " + AnsiColor.RESET);
-                avatarService.updateAvatarCustomization(avatar.getUserId(), newName, avatar.getColor(), avatar.getAccessory());
-                System.out.println(AnsiColor.GREEN + "Avatar name updated successfully!" + AnsiColor.RESET);
+        if (progressRecords.isEmpty()) {
+            System.out.println("No progress records found.");
+        } else {
+            System.out.println("User ID | Date & Time        | Score");
+            System.out.println("------------------------------------");
+            for (TestProgress progress : progressRecords) {
+                System.out.printf("%-7d | %-19s | %d%n",
+                        progress.getUserId(),
+                        progress.getTestTimestamp().format(DTF),
+                        progress.getCmasScore());
             }
-            case 2 -> {
-                String newColor = chooseAvatarColor();
-                if (newColor != null) {
-                    avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), newColor, avatar.getAccessory());
-                    System.out.println(AnsiColor.GREEN + "Avatar color updated successfully!" + AnsiColor.RESET);
+        }
+    }
+
+    
+
+    /**
+ * Handles viewing the avatar's ASCII art.
+ */
+private void handleViewAvatarAsciiArt() {
+    Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
+    if (avatarOpt.isPresent()) {
+        System.out.println("--- Avatar ASCII Art ---");
+        avatarOpt.get().displayAsciiArt(); // Display the ASCII art
+    } else {
+        System.out.println("You don't seem to have an avatar yet.");
+    }
+}
+
+    /**
+ * Handles customizing the avatar.
+ */
+private void handleCustomizeAvatar() {
+    System.out.println("--- Customize Avatar ---");
+    Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
+    if (!avatarOpt.isPresent()) {
+        System.out.println("You need an avatar first!");
+        return;
+    }
+
+
+    Avatar avatar = avatarOpt.get();
+
+    System.out.println("Current Avatar Details:");
+    System.out.println(avatar); // Display current avatar details
+
+    System.out.println("Choose an option to customize:");
+    System.out.println("1. Change Avatar Name");
+    System.out.println("2. Change Avatar Color");
+    System.out.println("3. Add/Change Cosmetic");
+    System.out.println("4. Remove Cosmetic");
+    System.out.println("0. Cancel");
+
+    int choice = promptForInt("Enter your choice (0-4): ");
+
+    switch (choice) {
+        case 1 -> {
+            String newName = promptForString("Enter new avatar name (" + avatar.getAvatarName() + "): ");
+            avatarService.updateAvatarCustomization(avatar.getUserId(), newName, avatar.getColor(), avatar.getAccessory());
+            System.out.println("Avatar name updated successfully!");
+        }
+        case 2 -> {
+            String newColor = promptForString("Enter new avatar color (" + avatar.getColor() + "): ");
+            avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), newColor, avatar.getAccessory());
+            System.out.println("Avatar color updated successfully!");
+        }
+        case 3 -> {
+            System.out.println("Choose a cosmetic to add/change:");
+            System.out.println("1. Bow");
+            System.out.println("2. Mustache");
+            System.out.println("3. Necklace");
+
+            int cosmeticChoice = promptForInt("Enter your choice (1-3): ");
+            String newAccessory;
+
+            switch (cosmeticChoice) {
+                case 1 -> newAccessory = "bow";
+                case 2 -> newAccessory = "mustache";
+                case 3 -> newAccessory = "necklace";
+                default -> {
+                    System.out.println("Invalid choice. No changes made.");
+                    return;
                 }
             }
-            case 3 -> {
-                System.out.println(AnsiColor.BRIGHT_BLUE + "Choose a cosmetic to add/change:" + AnsiColor.RESET);
-                System.out.println(AnsiColor.BRIGHT_GREEN + "1. Bow" + AnsiColor.RESET);
-                System.out.println(AnsiColor.BRIGHT_BLUE + "2. Mustache" + AnsiColor.RESET);
-                System.out.println(AnsiColor.BRIGHT_PURPLE + "3. Necklace" + AnsiColor.RESET);
-    
-                int cosmeticChoice = promptForInt(AnsiColor.CYAN + "Enter your choice (1-3): " + AnsiColor.RESET);
-                String newAccessory;
-    
-                switch (cosmeticChoice) {
-                    case 1 -> newAccessory = "bow";
-                    case 2 -> newAccessory = "mustache";
-                    case 3 -> newAccessory = "necklace";
-                    default -> {
-                        System.out.println(AnsiColor.RED + "Invalid choice. No changes made." + AnsiColor.RESET);
-                        return;
-                    }
-                }
-    
-                avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), avatar.getColor(), newAccessory);
-                System.out.println(AnsiColor.GREEN + "Cosmetic updated successfully!" + AnsiColor.RESET);
-            }
-            case 4 -> {
-                avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), avatar.getColor(), "none");
-                System.out.println(AnsiColor.GREEN + "Cosmetic removed successfully!" + AnsiColor.RESET);
-            }
-            case 0 -> System.out.println(AnsiColor.YELLOW + "Customization canceled." + AnsiColor.RESET);
-            default -> System.out.println(AnsiColor.RED + "Invalid choice. No changes made." + AnsiColor.RESET);
+
+            avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), avatar.getColor(), newAccessory);
+            System.out.println("Cosmetic updated successfully!");
         }
+        case 4 -> {
+            avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), avatar.getColor(), "none");
+            System.out.println("Cosmetic removed successfully!");
+        }
+        case 0 -> System.out.println("Customization canceled.");
+        default -> System.out.println("Invalid choice. No changes made.");
     }
-
-    private String chooseAvatarColor() {
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "--- Choose a Color ---" + AnsiColor.RESET);
-        System.out.println(AnsiColor.RED + "1. Red" + AnsiColor.RESET);
-        System.out.println(AnsiColor.GREEN + "2. Green" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BLUE + "3. Blue" + AnsiColor.RESET);
-        System.out.println(AnsiColor.YELLOW + "4. Yellow" + AnsiColor.RESET);
-        System.out.println(AnsiColor.PURPLE + "5. Purple" + AnsiColor.RESET);
-        System.out.println(AnsiColor.CYAN + "6. Cyan" + AnsiColor.RESET);
-        System.out.println(AnsiColor.WHITE + "7. White" + AnsiColor.RESET);
-        System.out.println(AnsiColor.BRIGHT_RED + "0. Cancel" + AnsiColor.RESET);
-    
-        int choice = promptForInt(AnsiColor.CYAN + "Enter your choice (0-7): " + AnsiColor.RESET);
-    
-        return switch (choice) {
-            case 1 -> "red";
-            case 2 -> "green";
-            case 3 -> "blue";
-            case 4 -> "yellow";
-            case 5 -> "purple";
-            case 6 -> "cyan";
-            case 7 -> "white";
-            case 0 -> {
-                System.out.println(AnsiColor.YELLOW + "Color selection canceled." + AnsiColor.RESET);
-                yield null;
-            }
-            default -> {
-                System.out.println(AnsiColor.RED + "Invalid choice. No changes made." + AnsiColor.RESET);
-                yield null;
-            }
-        };
-    }
-
+}
 
     private void handleRecordProgress() {
         System.out.println("--- Record CMAS Score ---");

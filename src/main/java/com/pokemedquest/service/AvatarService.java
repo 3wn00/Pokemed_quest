@@ -3,12 +3,8 @@ package com.pokemedquest.service;
 import com.pokemedquest.dao.AvatarDao;
 import com.pokemedquest.model.Avatar;
 import com.pokemedquest.model.User;
-import com.pokemedquest.util.AnsiColor;
 
 import java.util.Optional;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 /**
  * AvatarService provides logic related to user avatars.
@@ -34,23 +30,22 @@ public class AvatarService {
     public Optional<Avatar> createDefaultAvatar(User user, String avatarName) {
         // Check if the user already has an avatar
         if (avatarDao.findAvatarByUserId(user.getId()).isPresent()) {
-            System.err.println(AnsiColor.RED + "User already has an avatar. Cannot create a new one." + AnsiColor.RESET);
+            System.err.println("User already has an avatar. Cannot create a new one.");
             return Optional.empty();
         }
-
+    
         // Define default attributes for the avatar
         String defaultColor = "blue";
         String defaultAccessory = "none";
         int defaultLevel = 1;
-
+    
         Avatar newAvatar = new Avatar(user.getId(), avatarName, defaultColor, defaultAccessory, defaultLevel);
         boolean success = avatarDao.createAvatar(newAvatar);
-
+    
         if (success) {
-            System.out.println(AnsiColor.GREEN + "Default avatar created successfully for user ID: " + user.getId() + AnsiColor.RESET);
             return Optional.of(newAvatar);
         } else {
-            System.err.println(AnsiColor.RED + "Failed to create default avatar for user ID: " + user.getId() + AnsiColor.RESET);
+            System.err.println("Failed to create default avatar for user ID: " + user.getId());
             return Optional.empty();
         }
     }
@@ -64,9 +59,9 @@ public class AvatarService {
     public boolean createAvatar(Avatar avatar) {
         boolean success = avatarDao.createAvatar(avatar);
         if (success) {
-            System.out.println(AnsiColor.GREEN + "Avatar created for user ID: " + avatar.getUserId() + AnsiColor.RESET);
+            System.out.println("Avatar created for user ID: " + avatar.getUserId());
         } else {
-            System.err.println(AnsiColor.RED + "Failed to create avatar for user ID: " + avatar.getUserId() + AnsiColor.RESET);
+            System.err.println("Failed to create avatar for user ID: " + avatar.getUserId());
         }
         return success;
     }
@@ -81,67 +76,14 @@ public class AvatarService {
     }
 
     /**
-     * Displays the ASCII art of the avatar with color.
-     * @param avatar The avatar whose ASCII art is to be displayed.
+     * Retrieves an avatar by user ID.
+     *
+     * @param userId The ID of the user whose avatar is being retrieved.
+     * @return An Optional containing the Avatar if found, otherwise empty.
      */
-    public void displayAvatarAsciiArt(Avatar avatar) {
-        // Validate avatar attributes
-        if (avatar == null) {
-            System.err.println(AnsiColor.RED + "Error: Avatar is null. Cannot display ASCII art." + AnsiColor.RESET);
-            return;
-        }
-        if (avatar.getColor() == null || avatar.getColor().isEmpty()) {
-            System.err.println(AnsiColor.RED + "Error: Avatar color is missing. Cannot determine file path." + AnsiColor.RESET);
-            return;
-        }
-        if (avatar.getAccessory() == null) {
-            avatar.setAccessory("none"); // Default to "none" if accessory is null
-        }
-    
-        // Dynamically determine the file path based on the avatar's attributes
-        String filePath = "src/main/resources/ascii_art/avatar" + avatar.getLevel() + "_default_" + avatar.getColor().toLowerCase();
-        if (!"none".equals(avatar.getAccessory())) {
-            filePath += "_" + avatar.getAccessory().toLowerCase();
-        }
-        filePath += ".txt";
-    
-        // Debugging information
-        System.out.println(AnsiColor.BRIGHT_YELLOW + "--- Avatar ASCII Art ---" + AnsiColor.RESET);
-        System.out.println("Displaying ASCII art from: " + filePath);
-        System.out.println("DEBUG: File path is " + filePath);
-        System.out.println("DEBUG: Avatar details - Name: " + avatar.getAvatarName() +
-                           ", Level: " + avatar.getLevel() +
-                           ", Color: " + avatar.getColor() +
-                           ", Accessory: " + avatar.getAccessory());
-    
-        // Attempt to read and display the ASCII art
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line); // Display the ASCII art line by line
-            }
-        } catch (IOException e) {
-            System.err.println(AnsiColor.RED + "Error loading ASCII art from file: " + filePath + ". " + e.getMessage() + AnsiColor.RESET);
-        }
+    public Optional<Avatar> getAvatarByUserId(int userId) {
+        return avatarDao.findAvatarByUserId(userId);
     }
-
-    /**
- * Maps a color name to its corresponding ANSI color code.
- * @param color The name of the color.
- * @return The ANSI color code for the given color.
- */
-private String getColorCode(String color) {
-    return switch (color.toLowerCase()) {
-        case "red" -> "\u001B[31m";    // Red
-        case "green" -> "\u001B[32m";  // Green
-        case "blue" -> "\u001B[34m";   // Blue
-        case "yellow" -> "\u001B[33m"; // Yellow
-        case "purple" -> "\u001B[35m"; // Purple
-        case "cyan" -> "\u001B[36m";   // Cyan
-        case "white" -> "\u001B[37m";  // White
-        default -> "\u001B[0m";        // Reset (default color)
-    };
-}
 
     /**
      * Updates the customization of a user's avatar.
@@ -152,32 +94,31 @@ private String getColorCode(String color) {
      * @return true if the update was successful, false otherwise.
      */
     public boolean updateAvatarCustomization(int userId, String newName, String newColor, String newAccessory) {
-        Optional<Avatar> avatarOpt = this.getAvatarForUser(userId); // Use 'this' to call the method within the same class
+        Optional<Avatar> avatarOpt = avatarDao.findAvatarByUserId(userId);
         if (avatarOpt.isPresent()) {
             Avatar avatar = avatarOpt.get();
             avatar.setAvatarName(newName);
             avatar.setColor(newColor);
     
             // Update accessory and dynamically adjust ASCII art path
-            String filePath = "src/main/resources/ascii_art/avatar" + avatar.getLevel() + "_default_" + newColor.toLowerCase();
+            String basePath = "src/main/resources/ascii_art/";
+            String fileName = avatar.getAsciiArtPath();
+    
             if (!"none".equals(newAccessory)) {
-                filePath += "_" + newAccessory.toLowerCase();
+                // Add the new accessory to the file name
+                fileName = fileName.replace(".txt", "_" + newAccessory + ".txt");
+            } else {
+                // Remove the existing accessory from the file name
+                fileName = fileName.replace("_" + avatar.getAccessory() + ".txt", ".txt");
             }
-            filePath += ".txt";
     
             avatar.setAccessory(newAccessory); // Update the accessory
-            avatar.setAsciiArtPath(filePath);  // Update the ASCII art path
+            avatar.setAsciiArtPath(basePath + fileName); // Update the ASCII art path
     
             // Update in the database
-            boolean success = avatarDao.updateAvatarByUserId(avatar);
-            if (success) {
-                System.out.println(AnsiColor.GREEN + "Avatar customization updated successfully!" + AnsiColor.RESET);
-            } else {
-                System.err.println(AnsiColor.RED + "Failed to update avatar customization." + AnsiColor.RESET);
-            }
-            return success;
+            return avatarDao.updateAvatarByUserId(avatar);
         } else {
-            System.err.println(AnsiColor.RED + "Cannot update: Avatar not found for user ID: " + userId + AnsiColor.RESET);
+            System.err.println("Cannot update: Avatar not found for user ID: " + userId);
             return false;
         }
     }
@@ -188,20 +129,18 @@ private String getColorCode(String color) {
      * @return true if level up was successful, false otherwise.
      */
     public boolean levelUpAvatar(int userId) {
-        Optional<Avatar> avatarOpt = avatarDao.findAvatarByUserId(userId);
-        if (avatarOpt.isPresent()) {
-            Avatar avatar = avatarOpt.get();
-            avatar.setLevel(avatar.getLevel() + 1); // Increment level
-            boolean success = avatarDao.updateAvatarByUserId(avatar);
-            if (success) {
-                System.out.println(AnsiColor.GREEN + "Avatar for user " + userId + " leveled up to " + avatar.getLevel() + AnsiColor.RESET);
-            } else {
-                System.err.println(AnsiColor.RED + "Failed to level up avatar." + AnsiColor.RESET);
-            }
-            return success;
-        } else {
-            System.err.println(AnsiColor.RED + "Cannot level up: Avatar not found for user ID: " + userId + AnsiColor.RESET);
-            return false;
-        }
+         Optional<Avatar> avatarOpt = avatarDao.findAvatarByUserId(userId);
+         if (avatarOpt.isPresent()) {
+             Avatar avatar = avatarOpt.get();
+             avatar.setLevel(avatar.getLevel() + 1); // Increment level
+             boolean success = avatarDao.updateAvatarByUserId(avatar);
+             if(success){
+                 System.out.println("Avatar for user " + userId + " leveled up to " + avatar.getLevel());
+             }
+             return success;
+         } else {
+             System.err.println("Cannot level up: Avatar not found for user ID: " + userId);
+             return false;
+         }
     }
 }

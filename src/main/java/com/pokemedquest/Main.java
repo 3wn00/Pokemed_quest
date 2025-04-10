@@ -1,14 +1,13 @@
 package com.pokemedquest;
 
+import com.pokemedquest.cli.CliHandler;
 import com.pokemedquest.dao.AvatarDao;
 import com.pokemedquest.dao.TestProgressDao;
 import com.pokemedquest.dao.UserDao;
 import com.pokemedquest.service.AuthService;
 import com.pokemedquest.service.AvatarService;
 import com.pokemedquest.service.ProgressService;
-import com.pokemedquest.cli.CliHandler;
-
-import java.util.Scanner;
+import java.util.Scanner; // Assuming CliHandler is in 'cli' subpackage
 
 /**
  * Main entry point for the PokeMed_Quest application.
