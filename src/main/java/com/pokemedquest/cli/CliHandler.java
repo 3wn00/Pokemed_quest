@@ -36,6 +36,8 @@ public class CliHandler {
         this.progressService = progressService;
     }
 
+    
+
     /**
      * Starts the main application loop.
      */
@@ -326,13 +328,21 @@ public class CliHandler {
 
     private void handleViewAllAvatars() {
         System.out.println("--- View All Avatars ---");
-        List<Avatar> avatars = avatarService.getAllAvatars(); // Assuming this method exists in AvatarService
+        List<Avatar> avatars = avatarService.getAllAvatars();
     
         if (avatars.isEmpty()) {
             System.out.println("No avatars found.");
         } else {
             for (Avatar avatar : avatars) {
-                System.out.println(avatar); // Assuming Avatar has a meaningful toString() implementation
+                // Display avatar details with spacing between each
+                System.out.println("Avatar ID: " + avatar.getAvatarId());
+                System.out.println("User ID: " + avatar.getUserId());
+                System.out.println("Avatar Name: " + avatar.getAvatarName());
+                System.out.println("Color: " + avatar.getColor());
+                System.out.println("Accessory: " + avatar.getAccessory());
+                System.out.println("Level: " + avatar.getLevel());
+                System.out.println("ASCII Art Path: " + avatar.getAsciiArtPath());
+                System.out.println(); // Add a blank line for spacing
             }
         }
     }
@@ -391,6 +401,62 @@ private void handleCustomizeAvatar() {
         System.out.println("You need an avatar first!");
         return;
     }
+
+    Avatar avatar = avatarOpt.get();
+
+    System.out.println("Current Avatar Details:");
+    System.out.println(avatar); // Display current avatar details
+
+    System.out.println("Choose an option to customize:");
+    System.out.println("1. Change Avatar Name");
+    System.out.println("2. Change Avatar Color");
+    System.out.println("3. Add/Change Cosmetic");
+    System.out.println("4. Remove Cosmetic");
+    System.out.println("0. Cancel");
+
+    int choice = promptForInt("Enter your choice (0-4): ");
+
+    switch (choice) {
+        case 1 -> {
+            String newName = promptForString("Enter new avatar name (" + avatar.getAvatarName() + "): ");
+            avatarService.updateAvatarCustomization(avatar.getUserId(), newName, avatar.getColor(), avatar.getAccessory());
+            System.out.println("Avatar name updated successfully!");
+        }
+        case 2 -> {
+            String newColor = promptForString("Enter new avatar color (" + avatar.getColor() + "): ");
+            avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), newColor, avatar.getAccessory());
+            System.out.println("Avatar color updated successfully!");
+        }
+        case 3 -> {
+            System.out.println("Choose a cosmetic to add/change:");
+            System.out.println("1. Bow");
+            System.out.println("2. Mustache");
+            System.out.println("3. Necklace");
+
+            int cosmeticChoice = promptForInt("Enter your choice (1-3): ");
+            String newAccessory;
+
+            switch (cosmeticChoice) {
+                case 1 -> newAccessory = "bow";
+                case 2 -> newAccessory = "mustache";
+                case 3 -> newAccessory = "necklace";
+                default -> {
+                    System.out.println("Invalid choice. No changes made.");
+                    return;
+                }
+            }
+
+            avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), avatar.getColor(), newAccessory);
+            System.out.println("Cosmetic updated successfully!");
+        }
+        case 4 -> {
+            avatarService.updateAvatarCustomization(avatar.getUserId(), avatar.getAvatarName(), avatar.getColor(), "none");
+            System.out.println("Cosmetic removed successfully!");
+        }
+        case 0 -> System.out.println("Customization canceled.");
+        default -> System.out.println("Invalid choice. No changes made.");
+    }
+}
     
 
     private void handleViewAllProgressRecords() {
@@ -424,18 +490,12 @@ private void handleViewAvatarAsciiArt() {
     } else {
         System.out.println("You don't seem to have an avatar yet.");
     }
-}
+
 
     /**
  * Handles customizing the avatar.
  */
-private void handleCustomizeAvatar() {
-    System.out.println("--- Customize Avatar ---");
-    Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
-    if (!avatarOpt.isPresent()) {
-        System.out.println("You need an avatar first!");
-        return;
-    }
+
 
 
     Avatar avatar = avatarOpt.get();

@@ -3,7 +3,7 @@ package com.pokemedquest.service;
 import com.pokemedquest.dao.AvatarDao;
 import com.pokemedquest.model.Avatar;
 import com.pokemedquest.model.User;
-
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -19,6 +19,10 @@ public class AvatarService {
      */
     public AvatarService(AvatarDao avatarDao) {
         this.avatarDao = avatarDao;
+    }
+
+    public List<Avatar> getAllAvatars() {
+        return avatarDao.getAllAvatars();
     }
 
     /**

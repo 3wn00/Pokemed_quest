@@ -73,12 +73,6 @@ public class Avatar {
         String basePath = "src/main/resources/ascii_art/";
         String fileName;
     
-        // Debugging: Print the inputs
-        System.out.println("Determining ASCII art path...");
-        System.out.println("Avatar Name: " + avatarName);
-        System.out.println("Level: " + level);
-        System.out.println("Accessory: " + this.accessory);
-    
         // Determine the base file name based on the avatar's name and level
         switch (avatarName.toLowerCase()) {
             case "warrior":
@@ -108,9 +102,6 @@ public class Avatar {
     
         // Add the file extension
         fileName += ".txt";
-    
-        // Debugging: Print the final file name
-        System.out.println("Determined ASCII art file: " + fileName);
     
         return basePath + fileName;
     }

@@ -1,14 +1,14 @@
 package com.pokemedquest.dao;
 
 import com.pokemedquest.model.Avatar; // Import the Avatar model
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Optional;
-import com.pokemedquest.dao.DatabaseManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional; // Add this import
 
 /**
  * AvatarDao (Data Access Object) for Avatar entities.
@@ -21,6 +21,7 @@ public class AvatarDao {
     private static final String INSERT_AVATAR_SQL = "INSERT INTO avatars (user_id, avatar_name, color, accessory, level) VALUES (?, ?, ?, ?, ?)";
     private static final String SELECT_AVATAR_BY_USER_SQL = "SELECT avatar_id, user_id, avatar_name, color, accessory, level FROM avatars WHERE user_id = ?";
     private static final String UPDATE_AVATAR_BY_USER_SQL = "UPDATE avatars SET avatar_name = ?, color = ?, accessory = ?, level = ?, ascii_art_path = ? WHERE user_id = ?";
+    private static final String SELECT_ALL_AVATARS_SQL = "SELECT avatar_id, user_id, avatar_name, color, accessory, level, ascii_art_path FROM avatars";
     // Add DELETE statement if needed
     // private static final String DELETE_AVATAR_BY_USER_SQL = "DELETE FROM avatars WHERE user_id = ?";
 
@@ -32,6 +33,39 @@ public class AvatarDao {
      * @param avatar The Avatar object to save.
      * @return true if the avatar was created successfully, false otherwise.
      */
+
+     
+         
+         /**
+          * Retrieves all avatars from the database.
+          * @return List of all avatars.
+          */
+         public List<Avatar> getAllAvatars() {
+             List<Avatar> avatars = new ArrayList<>();
+             try (Connection connection = DatabaseManager.getConnection();
+                  PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_AVATARS_SQL);
+                  ResultSet resultSet = preparedStatement.executeQuery()) {
+     
+                 while (resultSet.next()) {
+                     Avatar avatar = new Avatar(
+                         resultSet.getInt("avatar_id"),
+                         resultSet.getInt("user_id"),
+                         resultSet.getString("avatar_name"),
+                         resultSet.getString("color"),
+                         resultSet.getString("accessory"),
+                         resultSet.getInt("level")
+                     );
+                     avatar.setAsciiArtPath(resultSet.getString("ascii_art_path"));
+                     avatars.add(avatar);
+                 }
+             } catch (SQLException e) {
+                 System.err.println("Error retrieving avatars from database: " + e.getMessage());
+                 e.printStackTrace();
+             }
+             return avatars;
+         }
+     
+
     public boolean createAvatar(Avatar avatar) {
         try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_AVATAR_SQL, Statement.RETURN_GENERATED_KEYS)) {
