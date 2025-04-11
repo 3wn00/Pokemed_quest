@@ -1,5 +1,4 @@
 package com.pokemedquest.cli;
-
 import com.pokemedquest.model.Avatar;
 import com.pokemedquest.model.TestProgress;
 import com.pokemedquest.model.User;
@@ -7,6 +6,10 @@ import com.pokemedquest.service.AuthService;
 import com.pokemedquest.service.AvatarService;
 import com.pokemedquest.service.ProgressService;
 import com.pokemedquest.service.ProgressService.LevelUpResult;
+import com.pokemedquest.util.AnsiColor;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -31,6 +34,51 @@ public class CliHandler {
         this.avatarService = avatarService;
         this.progressService = progressService;
     }
+
+    
+
+    private void displayAvatarWithColor(Avatar avatar) {
+        System.out.println("--- Displaying Avatar ---");
+
+        String colorCode;
+        switch (avatar.getColor().toLowerCase()) {
+            case "red":
+                colorCode = AnsiColor.RED;
+                break;
+            case "green":
+                colorCode = AnsiColor.GREEN;
+                break;
+            case "blue":
+                colorCode = AnsiColor.BLUE;
+                break;
+            case "yellow":
+                colorCode = AnsiColor.YELLOW;
+                break;
+            case "cyan":
+                colorCode = AnsiColor.CYAN;
+                break;
+            case "purple":
+                colorCode = AnsiColor.PURPLE;
+                break;
+            case "white":
+                colorCode = AnsiColor.WHITE;
+                break;
+            default:
+                colorCode = AnsiColor.RESET; 
+                break;
+        }
+
+    
+    String asciiArtPath = avatar.getAsciiArtPath();
+    try {
+        String asciiArt = Files.readString(Paths.get(asciiArtPath));
+        System.out.println(colorCode + asciiArt + AnsiColor.RESET);
+    } catch (IOException e) {
+        System.err.println("Error reading ASCII art file: " + asciiArtPath);
+        e.printStackTrace();
+    }
+}
+
 
 
   
@@ -543,15 +591,14 @@ public class CliHandler {
     }
 
     private void handleViewAvatarAsciiArt() {
+        System.out.println("--- View Avatar ASCII Art ---");
         Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
         if (avatarOpt.isPresent()) {
-            System.out.println("--- Avatar ---");
-            avatarOpt.get().displayAsciiArt();
+            displayAvatarWithColor(avatarOpt.get());
         } else {
-            System.out.println("You don't seem to have an avatar yet.");
+            System.out.println("No avatar found for the current user.");
         }
     }
-
     
 
 }
