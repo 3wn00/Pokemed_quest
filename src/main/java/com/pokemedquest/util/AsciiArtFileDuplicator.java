@@ -5,13 +5,13 @@ import java.util.Map;
 
 public class AsciiArtFileDuplicator {
     public static void main(String[] args) {
-        // Path to the directory containing the original ASCII art files
+        
         String inputDirectory = "src/main/resources/ascii_art/";
 
-        // Output directory for the new files
+        
         String outputDirectory = "src/main/resources/ascii_art/";
 
-        // Map of colors and their corresponding ANSI escape codes
+        
         Map<String, String> colors = Map.of(
             "red", "\u001B[31m",
             "green", "\u001B[32m",
@@ -22,7 +22,7 @@ public class AsciiArtFileDuplicator {
             "white", "\u001B[37m"
         );
 
-        // List of existing files to duplicate (add more as needed)
+       
         String[] existingFiles = {
             "avatar1_default.txt",
             "avatar1_default_bow.txt",
@@ -62,13 +62,13 @@ public class AsciiArtFileDuplicator {
             "avatar3_evolved2_necklace.txt",
         };
 
-        // Ensure the output directory exists
+        
         File outputDir = new File(outputDirectory);
         if (!outputDir.exists()) {
             outputDir.mkdirs();
         }
 
-        // Process each existing file
+        
         for (String fileName : existingFiles) {
             String inputFilePath = inputDirectory + fileName;
 
@@ -79,19 +79,19 @@ public class AsciiArtFileDuplicator {
                     originalContent.append(line).append("\n");
                 }
 
-                // Create new files for each color
+               
                 for (Map.Entry<String, String> entry : colors.entrySet()) {
                     String colorName = entry.getKey();
                     String colorCode = entry.getValue();
 
-                    // Apply the color to the entire content
+                   
                     String coloredContent = colorCode + originalContent + "\u001B[0m";
 
-                    // Generate the new file name
+                   
                     String newFileName = fileName.replace(".txt", "_" + colorName + ".txt");
                     String newFilePath = outputDirectory + newFileName;
 
-                    // Write the colored content to the new file
+                    
                     try (BufferedWriter writer = new BufferedWriter(new FileWriter(newFilePath))) {
                         writer.write(coloredContent);
                     }

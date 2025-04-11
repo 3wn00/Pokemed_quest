@@ -6,17 +6,14 @@ import com.pokemedquest.model.User;
 import com.pokemedquest.service.AuthService;
 import com.pokemedquest.service.AvatarService;
 import com.pokemedquest.service.ProgressService;
-import com.pokemedquest.service.ProgressService.LevelUpResult; // Import the inner record
-
+import com.pokemedquest.service.ProgressService.LevelUpResult;
 import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
-/**
- * Handles the Command Line Interface interactions for PokeMed Quest.
- */
+
 public class CliHandler {
 
     private final Scanner scanner;
@@ -24,9 +21,7 @@ public class CliHandler {
     private final AvatarService avatarService;
     private final ProgressService progressService;
 
-    private User currentUser = null; // Stores the currently logged-in user
-
-    // Formatter for displaying dates/times nicely
+    private User currentUser = null; 
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 
@@ -38,9 +33,7 @@ public class CliHandler {
     }
 
 
-    /**
-     * Starts the main application loop.
-     */
+  
     public void run() {
         boolean running = true;
         while (running) {
@@ -61,24 +54,23 @@ public class CliHandler {
                         System.out.println("Invalid choice. Please try again.");
                 }
             } else {
-                // User is logged in - show appropriate menu
                 System.out.println("\n--- Logged in as: " + currentUser.getUsername() + " (" + currentUser.getRole() + ") ---");
                 if ("child".equalsIgnoreCase(currentUser.getRole())) {
                     showChildMenu();
                     int choice = promptForInt("Enter choice: ");
-                    running = handleChildChoice(choice); // handleChildChoice returns false if user logs out/exits
-                } else { // Assume "admin" or "doctor" role
+                    running = handleChildChoice(choice); 
+                } else { 
                     showAdminMenu();
                     int choice = promptForInt("Enter choice: ");
-                    running = handleAdminChoice(choice); // handleAdminChoice returns false if user logs out/exits
+                    running = handleAdminChoice(choice); 
                 }
             }
-            System.out.println(); // Add a newline for spacing
+            System.out.println(); 
         }
         System.out.println("Exiting PokeMed Quest. Goodbye!");
     }
 
-    // --- Menu Display Methods ---
+
 
     private void showMainMenu() {
         System.out.println("--- Main Menu ---");
@@ -93,8 +85,8 @@ public class CliHandler {
         System.out.println("2. Customize Avatar");
         System.out.println("3. Record CMAS Score");
         System.out.println("4. View My Progress History");
-        // Removed old Level Up option 5
-        System.out.println("5. View Avatar ASCII Art"); // Renumbered from 6
+        
+        System.out.println("5. View Avatar ASCII Art"); 
         System.out.println("0. Logout");
     }
 
@@ -109,7 +101,7 @@ public class CliHandler {
     }
 
 
-    // --- Input Helper Methods ---
+   
 
     private String promptForString(String message) {
         System.out.print(message);
@@ -120,23 +112,21 @@ public class CliHandler {
         while (true) {
             System.out.print(message);
             try {
-                int value = Integer.parseInt(scanner.nextLine()); // Use parseInt with nextLine
+                int value = Integer.parseInt(scanner.nextLine()); 
                 return value;
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a whole number.");
-            } catch (InputMismatchException e) { // Keep just in case nextInt was used somewhere else
+            } catch (InputMismatchException e) { 
                  System.out.println("Invalid input. Please enter a number.");
-                 scanner.nextLine(); // Consume the invalid input if nextInt was used
+                 scanner.nextLine(); 
             }
         }
     }
 
-    // --- Action Handler Methods ---
-
+   
     private void handleRegister() {
         System.out.println("--- Register New User ---");
         String username = promptForString("Enter username: ");
-        // Basic validation - check if username exists? (AuthService should handle this)
         String password = promptForString("Enter password: ");
         String role = "";
         while (!role.equals("child") && !role.equals("admin")) {
@@ -171,13 +161,13 @@ public class CliHandler {
                         break;
                 }
 
-                // Create the default avatar using the service
+                
                 Optional<Avatar> createdAvatarOpt = avatarService.createDefaultAvatar(newUser, avatarName);
 
                 if (createdAvatarOpt.isPresent()) {
                     System.out.println("Avatar '" + avatarName + "' created successfully!");
                     System.out.println("Initial Avatar State:");
-                    System.out.println(createdAvatarOpt.get()); // Show initial state including level 1, 0 xp
+                    System.out.println(createdAvatarOpt.get()); 
                 } else {
                     System.out.println("Failed to create avatar after registration.");
                 }
@@ -196,7 +186,7 @@ public class CliHandler {
         Optional<User> userOptional = authService.loginUser(username, password);
 
         if (userOptional.isPresent()) {
-            currentUser = userOptional.get(); // Set the logged-in user
+            currentUser = userOptional.get(); 
             System.out.println("Login successful! Welcome, " + currentUser.getUsername() + "!");
         } else {
             System.out.println("Login failed. Invalid username or password.");
@@ -206,7 +196,7 @@ public class CliHandler {
 
     private void handleLogout() {
         System.out.println("Logging out " + currentUser.getUsername() + "...");
-        currentUser = null; // Clear the current user
+        currentUser = null; 
     }
 
 
@@ -224,17 +214,17 @@ public class CliHandler {
             case 4:
                 handleViewHistory();
                 break;
-            case 5: // Renumbered from 6
+            case 5: 
                 handleViewAvatarAsciiArt();
                 break;
-            // Removed case for old handleLevelUp()
+           
             case 0:
                 handleLogout();
-                return true; // Still running, just logged out
+                return true; 
             default:
                 System.out.println("Invalid choice.");
         }
-        return true; // Keep running
+        return true; 
     }
 
     private boolean handleAdminChoice(int choice) {
@@ -256,15 +246,15 @@ public class CliHandler {
                 break;
             case 0:
                 handleLogout();
-                return true; // Still running, just logged out
+                return true; 
             default:
                 System.out.println("Invalid choice.");
         }
-        return true; // Keep running
+        return true; 
     }
 
 
-    // --- Admin Action Handlers ---
+  
 
     private void handleViewPatientProgress() {
         System.out.println("--- View Patient Progress ---");
@@ -320,14 +310,14 @@ public class CliHandler {
             return;
         }
 
-        // Add confirmation step
+       
         String confirm = promptForString("Are you sure you want to delete user '" + username + "' and all associated data? (yes/no): ");
         if (!"yes".equalsIgnoreCase(confirm)) {
             System.out.println("Deletion cancelled.");
             return;
         }
 
-        boolean success = authService.deleteUserByUsername(username); // Assuming this cascades via FK constraints
+        boolean success = authService.deleteUserByUsername(username); 
 
         if (success) {
             System.out.println("User account '" + username + "' deleted successfully.");
@@ -338,7 +328,7 @@ public class CliHandler {
 
     private void handleListAllUsers() {
         System.out.println("--- List All Users ---");
-        List<User> users = authService.getAllUsers(); // Assuming this method exists
+        List<User> users = authService.getAllUsers(); 
 
         if (users.isEmpty()) {
             System.out.println("No users found in the system.");
@@ -362,13 +352,13 @@ public class CliHandler {
         } else {
             System.out.println("------------------------------------------------------------------------------------");
             for (Avatar avatar : avatars) {
-                // Display avatar details, including new experience field
+               
                  System.out.printf("User ID: %d | Avatar ID: %d | Name: %s | Level: %d | Experience: %d | Color: %s | Accessory: %s%n",
                                  avatar.getUserId(),
                                  avatar.getAvatarId(),
                                  avatar.getAvatarName(),
                                  avatar.getLevel(),
-                                 avatar.getTotalExperience(), // Display experience
+                                 avatar.getTotalExperience(), 
                                  avatar.getColor(),
                                  avatar.getAccessory());
                  System.out.println("  ASCII Path: " + avatar.getAsciiArtPath());
@@ -380,20 +370,16 @@ public class CliHandler {
 
 
 
-    // --- Child Action Handlers ---
+    
 
     private void handleViewAvatar() {
         Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
         if(avatarOpt.isPresent()){
             System.out.println("--- Your Avatar ---");
-            // Use the updated toString() which includes totalExperience
             System.out.println(avatarOpt.get());
-            // Optionally show ASCII art here too
-            // avatarOpt.get().displayAsciiArt();
         } else {
             System.out.println("You don't seem to have an avatar yet. One should have been created during registration.");
-            // Consider adding logic to create one if missing, though it shouldn't happen with current registration flow.
-        }
+           }
     }
 
     private void handleCustomizeAvatar() {
@@ -407,7 +393,7 @@ public class CliHandler {
         Avatar avatar = avatarOpt.get();
 
         System.out.println("Current Avatar Details:");
-        System.out.println(avatar); // Display current avatar details
+        System.out.println(avatar); 
 
         System.out.println("\nChoose an option to customize:");
         System.out.println("1. Change Avatar Name");
@@ -458,7 +444,7 @@ public class CliHandler {
                     case 3: newAccessory = "necklace"; break;
                     default:
                         System.out.println("Invalid cosmetic choice.");
-                        return; // Exit customization
+                        return;
                 }
 
                 if (!newAccessory.equals(avatar.getAccessory())) {
@@ -486,11 +472,10 @@ public class CliHandler {
                 return;
         }
 
-        // Report outcome
-         if (!updatedField.isEmpty()) { // Only report if an attempt was made
+       
+         if (!updatedField.isEmpty()) { 
             if (success) {
                 System.out.println("Avatar " + updatedField + " updated successfully!");
-                // Show updated avatar
                 handleViewAvatar();
             } else {
                 System.out.println("Failed to update avatar " + updatedField + ".");
@@ -502,7 +487,7 @@ public class CliHandler {
     private void handleRecordProgress() {
         System.out.println("--- Record CMAS Score ---");
         int score = -1;
-        while (score < 0) { // Basic validation: Ensure score is not negative
+        while (score < 0) { 
              score = promptForInt("Enter the CMAS score achieved (points gained): ");
              if (score < 0) {
                  System.out.println("Score cannot be negative. Please enter 0 or higher.");
@@ -522,13 +507,11 @@ public class CliHandler {
                 System.out.println("* CONGRATULATIONS! Avatar Leveled Up! *");
                 System.out.println("* New Level: " + result.newLevel() + "            *");
                 System.out.println("*************************************\n");
-                 // Optionally show the updated avatar details immediately
                  handleViewAvatar();
-                 handleViewAvatarAsciiArt(); // Show new art if level changed evolution
+                 handleViewAvatarAsciiArt();
             } else if (result.newLevel() == -1) {
                  System.out.println(" (Could not update avatar stats - avatar not found)");
             } else {
-                 // Optionally show updated experience even if no level up
                  Optional<Avatar> currentAvatarOpt = avatarService.getAvatarForUser(currentUser.getId());
                  currentAvatarOpt.ifPresent(av -> System.out.println("  Total Experience: " + av.getTotalExperience()));
             }
@@ -554,7 +537,6 @@ public class CliHandler {
                         progress.getCmasScore());
             }
             System.out.println("+---------------------+-------+");
-            // Optionally show total score/level here too
             Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
             avatarOpt.ifPresent(av -> System.out.printf("Current Level: %d | Total Experience: %d\n", av.getLevel(), av.getTotalExperience()));
         }
@@ -564,12 +546,12 @@ public class CliHandler {
         Optional<Avatar> avatarOpt = avatarService.getAvatarForUser(currentUser.getId());
         if (avatarOpt.isPresent()) {
             System.out.println("--- Avatar ---");
-            avatarOpt.get().displayAsciiArt(); // Display the ASCII art
+            avatarOpt.get().displayAsciiArt();
         } else {
             System.out.println("You don't seem to have an avatar yet.");
         }
     }
 
-    // handleLevelUp() method is now removed as leveling is automatic.
+    
 
 }

@@ -8,7 +8,7 @@ public class AsciiArtLoader {
 
     public static String loadAsciiArt(String filePath) {
         try {
-            // Debugging: Print the absolute path being accessed
+            
             System.out.println("Attempting to load ASCII art from: " + Paths.get(filePath).toAbsolutePath());
 
             return new String(Files.readAllBytes(Paths.get(filePath)));

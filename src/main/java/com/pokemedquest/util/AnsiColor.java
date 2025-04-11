@@ -1,9 +1,6 @@
 package com.pokemedquest.util;
 
-/**
- * Utility class for ANSI color codes.
- * Provides constants for text colors and styles.
- */
+
 public class AnsiColor {
     public static final String RESET = "\u001B[0m";
     public static final String BLACK = "\u001B[30m";
