@@ -1,0 +1,156 @@
+``mermaid
+classDiagram
+
+class CliHandler {
+    -Scanner scanner
+    -AuthService authService
+    -AvatarService avatarService
+    -ProgressService progressService %% Might be simpler
+    -int POINTS_PER_LEVEL %% Logic constant here
+    +run()
+    +handleRecordProgress() %% Contains leveling calculation!
+    +handleLogin()
+    +handleRegister()
+    +handleCustomizeAvatar()
+    +handleViewAvatar()
+    +handleViewHistory()
+    +handleAdminChoice(int)
+    # Other private handler methods...
+    +displayAvatarWithColor(Avatar)
+    +promptForInt(String)
+    +promptForString(String)
+}
+
+class AuthService {
+    -UserDao userDao
+    -AvatarService avatarService
+    +AuthService(UserDao, AvatarService)
+    # Methods filled in from Diagram 1/Code:
+    +registerUser(String, String, String) Optional&lt;User&gt;
+    +loginUser(String, String) Optional&lt;User&gt;
+    +findUserByUsername(String) Optional&lt;User&gt;
+    +getAllUsers() List&lt;User&gt;
+    +deleteUserByUsername(String) boolean
+}
+
+class AvatarService {
+    -AvatarDao avatarDao
+    +AvatarService(AvatarDao)
+    +getAvatarForUser(int) Optional&lt;Avatar&gt;
+    +updateAvatarStats(Avatar) boolean %% Simple update call (used by CliHandler here)
+    +createDefaultAvatar(User, String) Optional&lt;Avatar&gt;
+    +updateAvatarCustomization(int, String, String, String) boolean
+    +getAllAvatars() List&lt;Avatar&gt;
+    %% Leveling logic is NOT here
+}
+
+class ProgressService {
+    -TestProgressDao testProgressDao
+    %% No AvatarService needed if only saving score
+    +ProgressService(TestProgressDao) %% Simpler constructor
+    +recordTestProgressOnly(int, int) Optional&lt;TestProgress&gt; %% Just saves score
+    +getProgressHistoryForUser(int) List&lt;TestProgress&gt;
+    +getAllProgressRecords() List&lt;TestProgress&gt;
+    %% Leveling logic is NOT here
+}
+
+class UserDao {
+    # Methods filled in from Diagram 1/Code:
+    +createUser(User) boolean
+    +findUserByUsername(String) Optional&lt;User&gt;
+    +findUserById(int) Optional&lt;User&gt;
+    +getAllUsers() List&lt;User&gt;
+    +deleteUserByUsername(String) boolean
+}
+class AvatarDao {
+    # Methods filled in from Diagram 1/Code:
+    +createAvatar(Avatar) boolean
+    +findAvatarByUserId(int) Optional&lt;Avatar&gt;
+    +updateAvatarByUserId(Avatar) boolean
+    +getAllAvatars() List&lt;Avatar&gt;
+}
+class TestProgressDao {
+    # Methods filled in from Diagram 1/Code:
+    +createTestProgress(TestProgress) boolean
+    +findProgressByUserId(int) List&lt;TestProgress&gt;
+    +findAllProgressRecords() List&lt;TestProgress&gt;
+    +findProgressById(int) Optional&lt;TestProgress&gt;
+}
+
+class DatabaseManager {
+     <<static>> +getConnection() Connection
+}
+
+class Avatar {
+    # Attributes filled in from Diagram 1/Code (no addExperience method):
+    -int avatarId
+    -int userId
+    -String avatarName
+    -String color
+    -String accessory
+    -int level
+    -int totalExperience
+    -String asciiArtPath
+    # Constructors and methods filled in:
+    +Avatar(int, String, String, String)
+    +Avatar(int, int, String, String, String, int, int)
+    +setLevel(int) void
+    +setTotalExperience(int) void
+    +displayAsciiArt() void
+    # Getters...
+}
+
+class User {
+    # Attributes/Constructors filled in from Diagram 1/Code:
+    -int id
+    -String username
+    -String passwordHash
+    -String role
+    +User(String, String, String)
+    +User(int, String, String, String)
+    # Getters...
+}
+
+class TestProgress {
+    # Attributes/Constructors filled in from Diagram 1/Code:
+    -int progressId
+    -int userId
+    -LocalDateTime testTimestamp
+    -int cmasScore
+    +TestProgress(int, LocalDateTime, int)
+    +TestProgress(int, int, LocalDateTime, int)
+    # Getters...
+}
+
+
+CliHandler --> AuthService : uses
+CliHandler --> AvatarService : uses (get/save Avatar)
+CliHandler --> ProgressService : uses (save score)
+CliHandler ..> Avatar : uses (gets data, sets level/xp)
+
+AuthService --> UserDao : uses
+AuthService --> AvatarService : uses
+AvatarService --> AvatarDao : uses
+ProgressService --> TestProgressDao : uses
+
+UserDao --> DatabaseManager : uses (static)
+AvatarDao --> DatabaseManager : uses (static)
+TestProgressDao --> DatabaseManager : uses (static)
+
+AuthService ..> User : uses
+AvatarService ..> Avatar : uses
+AvatarService ..> User : uses
+ProgressService ..> TestProgress : uses
+CliHandler ..> User : uses
+CliHandler ..> TestProgress : uses
+UserDao ..> User : creates/returns
+AvatarDao ..> Avatar : creates/returns
+TestProgressDao ..> TestProgress : creates/returns
+
+Avatar ..> AsciiArtLoader : uses
+
+
+%% Note: CliHandler is now complex, tightly coupled to models and services
+%% Note: ProgressService is very simple
+%% Note: Testing leveling logic requires testing the CLI
+```
