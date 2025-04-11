@@ -1,0 +1,140 @@
+```mermaid
+classDiagram
+
+class CliHandler {
+    -Scanner scanner
+    -AuthService authService
+    -AvatarService avatarService
+    -ProgressService progressService
+    +run()
+    +handleLogin()
+    +handleRegister()
+    +handleRecordProgress()
+    +handleCustomizeAvatar()
+    +handleViewAvatar()
+    +handleViewHistory()
+    +handleAdminChoice(int)
+    +displayAvatarWithColor(Avatar)
+    +promptForInt(String)
+    +promptForString(String)
+}
+
+class AuthService {
+    -UserDao userDao
+    -AvatarService avatarService
+    +AuthService(UserDao, AvatarService)
+    +registerUser(String, String, String) Optional&lt;User&gt;
+    +loginUser(String, String) Optional&lt;User&gt;
+    +findUserByUsername(String) Optional&lt;User&gt;
+    +getAllUsers() List&lt;User&gt;
+    +deleteUserByUsername(String) boolean
+}
+
+class AvatarService {
+    -AvatarDao avatarDao
+    +AvatarService(AvatarDao)
+    +createDefaultAvatar(User, String) Optional&lt;Avatar&gt;
+    +createAvatar(Avatar) boolean
+    +getAvatarForUser(int) Optional&lt;Avatar&gt;
+    +updateAvatarCustomization(int, String, String, String) boolean
+    +updateAvatarStats(Avatar) boolean
+    +getAllAvatars() List&lt;Avatar&gt;
+}
+
+class ProgressService {
+    -TestProgressDao testProgressDao
+    -AvatarService avatarService
+    -int POINTS_PER_LEVEL
+    +ProgressService(TestProgressDao, AvatarService)
+    +recordTestResult(int, int) Optional&lt;LevelUpResult&gt;
+    +getProgressHistoryForUser(int) List&lt;TestProgress&gt;
+    +getAllProgressRecords() List&lt;TestProgress&gt;
+}
+
+class UserDao {
+    +createUser(User) boolean
+    +findUserByUsername(String) Optional&lt;User&gt;
+    +findUserById(int) Optional&lt;User&gt;
+    +getAllUsers() List&lt;User&gt;
+    +deleteUserByUsername(String) boolean
+}
+
+class AvatarDao {
+    +createAvatar(Avatar) boolean
+    +findAvatarByUserId(int) Optional&lt;Avatar&gt;
+    +updateAvatarByUserId(Avatar) boolean
+    +getAllAvatars() List&lt;Avatar&gt;
+}
+
+class TestProgressDao {
+    +createTestProgress(TestProgress) boolean
+    +findProgressByUserId(int) List&lt;TestProgress&gt;
+    +findAllProgressRecords() List&lt;TestProgress&gt;
+    +findProgressById(int) Optional&lt;TestProgress&gt;
+}
+
+class DatabaseManager {
+    <<static>> +getConnection() Connection
+}
+
+class User {
+    -int id
+    -String username
+    -String passwordHash
+    -String role
+    +User(String, String, String)
+    +User(int, String, String, String)
+}
+
+class Avatar {
+    -int avatarId
+    -int userId
+    -String avatarName
+    -String color
+    -String accessory
+    -int level
+    -int totalExperience
+    -String asciiArtPath
+    +Avatar(int, String, String, String)
+    +Avatar(int, int, String, String, String, int, int)
+    +setLevel(int) void
+    +setTotalExperience(int) void
+    +displayAsciiArt() void
+}
+
+class TestProgress {
+    -int progressId
+    -int userId
+    -LocalDateTime testTimestamp
+    -int cmasScore
+    +TestProgress(int, LocalDateTime, int)
+    +TestProgress(int, int, LocalDateTime, int)
+}
+
+CliHandler --> AuthService : uses
+CliHandler --> AvatarService : uses
+CliHandler --> ProgressService : uses
+AuthService --> UserDao : uses
+AuthService --> AvatarService : uses
+AvatarService --> AvatarDao : uses
+ProgressService --> TestProgressDao : uses
+ProgressService --> AvatarService : uses
+
+UserDao --> DatabaseManager : uses (static)
+AvatarDao --> DatabaseManager : uses (static)
+TestProgressDao --> DatabaseManager : uses (static)
+
+AuthService ..> User : uses
+AvatarService ..> Avatar : uses
+AvatarService ..> User : uses
+ProgressService ..> TestProgress : uses
+ProgressService ..> Avatar : uses
+CliHandler ..> User : uses
+CliHandler ..> Avatar : uses
+CliHandler ..> TestProgress : uses
+UserDao ..> User : creates/returns
+AvatarDao ..> Avatar : creates/returns
+TestProgressDao ..> TestProgress : creates/returns
+
+Avatar ..> AsciiArtLoader : uses
+```
