@@ -1,7 +1,6 @@
 package com.pokemedquest.dao;
 
 import com.pokemedquest.model.TestProgress; // Import the TestProgress model
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime; // Used in the model
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import com.pokemedquest.dao.DatabaseManager;
 
 /**
  * TestProgressDao (Data Access Object) for TestProgress entities.
@@ -23,10 +21,69 @@ public class TestProgressDao {
     // SQL query strings - Adjust table/column names as needed
     private static final String INSERT_PROGRESS_SQL = "INSERT INTO test_progress (user_id, test_timestamp, cmas_score) VALUES (?, ?, ?)";
     private static final String SELECT_PROGRESS_BY_USER_SQL = "SELECT progress_id, user_id, test_timestamp, cmas_score FROM test_progress WHERE user_id = ? ORDER BY test_timestamp DESC"; // Order by most recent
+    private static final String SELECT_ALL_PROGRESS_SQL = "SELECT progress_id, user_id, test_timestamp, cmas_score FROM test_progress ORDER BY test_timestamp DESC";
     private static final String SELECT_PROGRESS_BY_ID_SQL = "SELECT progress_id, user_id, test_timestamp, cmas_score FROM test_progress WHERE progress_id = ?";
     // Add UPDATE and DELETE SQL statements later if needed
     // private static final String UPDATE_PROGRESS_SQL = "UPDATE test_progress SET user_id = ?, test_timestamp = ?, cmas_score = ? WHERE progress_id = ?";
     // private static final String DELETE_PROGRESS_SQL = "DELETE FROM test_progress WHERE progress_id = ?";
+
+    
+    /**
+     * Finds all test progress records for a specific user, ordered by most recent first.
+     *
+     * @param userId The ID of the user whose progress records to find.
+     * @return A List of TestProgress objects (potentially empty).
+     */
+    public List<TestProgress> findProgressByUserId(int userId) {
+        List<TestProgress> progressList = new ArrayList<>();
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_PROGRESS_BY_USER_SQL)) {
+
+            preparedStatement.setInt(1, userId);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                while (rs.next()) {
+                    int progressId = rs.getInt("progress_id");
+                    LocalDateTime timestamp = rs.getTimestamp("test_timestamp").toLocalDateTime();
+                    int cmasScore = rs.getInt("cmas_score");
+
+                    TestProgress progress = new TestProgress(progressId, userId, timestamp, cmasScore);
+                    progressList.add(progress);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error finding progress records by user ID: " + e.getMessage());
+        }
+        return progressList;
+    }
+
+    /**
+     * Finds all test progress records in the database, ordered by most recent first.
+     *
+     * @return A List of all TestProgress objects (potentially empty).
+     */
+    public List<TestProgress> findAllProgressRecords() {
+        List<TestProgress> progressList = new ArrayList<>();
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_PROGRESS_SQL);
+             ResultSet rs = preparedStatement.executeQuery()) {
+
+            while (rs.next()) {
+                int progressId = rs.getInt("progress_id");
+                int userId = rs.getInt("user_id");
+                LocalDateTime timestamp = rs.getTimestamp("test_timestamp").toLocalDateTime();
+                int cmasScore = rs.getInt("cmas_score");
+
+                TestProgress progress = new TestProgress(progressId, userId, timestamp, cmasScore);
+                progressList.add(progress);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error finding all progress records: " + e.getMessage());
+        }
+        return progressList;
+    }
+
+
 
 
     /**
@@ -67,31 +124,6 @@ public class TestProgressDao {
      * @param userId The ID of the user whose progress records to find.
      * @return A List of TestProgress objects (potentially empty).
      */
-    public List<TestProgress> findProgressByUserId(int userId) {
-        List<TestProgress> progressList = new ArrayList<>();
-        try (Connection connection = DatabaseManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_PROGRESS_BY_USER_SQL)) {
-
-            preparedStatement.setInt(1, userId);
-
-            try (ResultSet rs = preparedStatement.executeQuery()) {
-                // Loop through all results
-                while (rs.next()) {
-                    int progressId = rs.getInt("progress_id");
-                    // userId is known
-                    // Convert java.sql.Timestamp from DB back to LocalDateTime
-                    LocalDateTime timestamp = rs.getTimestamp("test_timestamp").toLocalDateTime();
-                    int cmasScore = rs.getInt("cmas_score");
-
-                    TestProgress progress = new TestProgress(progressId, userId, timestamp, cmasScore);
-                    progressList.add(progress);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error finding progress records by user ID: " + e.getMessage());
-        }
-        return progressList; // Return the list (might be empty)
-    }
 
     /**
      * Finds a specific test progress record by its unique ID.

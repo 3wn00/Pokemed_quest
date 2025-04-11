@@ -3,10 +3,8 @@ package com.pokemedquest.service;
 import com.pokemedquest.dao.TestProgressDao;
 import com.pokemedquest.model.Avatar;
 import com.pokemedquest.model.TestProgress;
-
-
+import com.pokemedquest.service.ProgressService.LevelUpResult;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +24,27 @@ public class ProgressService {
     public record LevelUpResult(TestProgress progress, boolean leveledUp, int newLevel, int gainedExperience) {}
 
 
+
+    /**
+     * Retrieves the complete test history for a specific user.
+     *
+     * @param userId The ID of the user.
+     * @return A List of TestProgress objects (may be empty).
+     */
+    public List<TestProgress> getProgressHistoryForUser(int userId) {
+        return testProgressDao.findProgressByUserId(userId);
+    }
+
+    /**
+     * Retrieves all progress records from the database.
+     *
+     * @return A List of all TestProgress objects (may be empty).
+     */
+    public List<TestProgress> getAllProgressRecords() {
+        return testProgressDao.findAllProgressRecords();
+    }
+
+    
     /**
      * Constructor for dependency injection.
      * @param testProgressDao The TestProgressDao instance.
@@ -123,11 +142,7 @@ public class ProgressService {
      * @param userId The ID of the user.
      * @return A List of TestProgress objects (may be empty).
      */
-    public List<TestProgress> getProgressHistoryForUser(int userId) {
-        // Assuming DAO returns sorted list
-        return testProgressDao.findProgressByUserId(userId);
-    }
-
+    
     /**
      * Gets the most recent test progress record for a user, if any.
      * @param userId The ID of the user.
@@ -143,11 +158,7 @@ public class ProgressService {
     * NOTE: This might be inefficient if there are many records. Consider pagination later.
     * @return A list of all TestProgress records.
     */
-    public List<TestProgress> getAllProgressRecords() {
-        // Requires a corresponding method in TestProgressDao, e.g., findAllProgressRecords()
-        return testProgressDao.findAllProgressRecords(); // !!! YOU NEED TO ADD findAllProgressRecords() to TestProgressDao !!!
-    }
-
+   
 
     // --- TODO: Add methods for anomaly detection logic later ---
 

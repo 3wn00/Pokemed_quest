@@ -33,7 +33,16 @@ public class AuthService {
         return userDao.deleteUserByUsername(username);
     }
    
-
+        /**
+     * Finds a user by their username.
+     *
+     * @param username The username to search for.
+     * @return An Optional containing the User if found, otherwise an empty Optional.
+     */
+    public Optional<User> findUserByUsername(String username) {
+        return userDao.findUserByUsername(username);
+    }
+    
     public List<User> getAllUsers() {
         // Assuming userDao has a method to retrieve all users
         return userDao.getAllUsers();

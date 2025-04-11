@@ -266,11 +266,11 @@ public class CliHandler {
 
     // --- Admin Action Handlers ---
 
-     private void handleViewPatientProgress() {
+    private void handleViewPatientProgress() {
         System.out.println("--- View Patient Progress ---");
         String username = promptForString("Enter the username of the patient: ");
-        Optional<User> userOpt = authService.findUserByUsername(username); // Assuming this method exists
-
+        Optional<User> userOpt = authService.findUserByUsername(username);
+    
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             List<TestProgress> progressRecords = progressService.getProgressHistoryForUser(user.getId());
@@ -292,7 +292,26 @@ public class CliHandler {
             System.out.println("User '" + username + "' not found.");
         }
     }
-
+    
+    private void handleViewAllProgressRecords() {
+        System.out.println("--- View All Progress Records ---");
+        List<TestProgress> progressRecords = progressService.getAllProgressRecords();
+    
+        if (progressRecords.isEmpty()) {
+            System.out.println("No progress records found in the system.");
+        } else {
+            System.out.println("+---------+---------------------+-------+");
+            System.out.println("| User ID | Date & Time         | Score |");
+            System.out.println("+---------+---------------------+-------+");
+            for (TestProgress progress : progressRecords) {
+                System.out.printf("| %-7d | %-19s | %-5d |\n",
+                        progress.getUserId(),
+                        progress.getTestTimestamp().format(DTF),
+                        progress.getCmasScore());
+            }
+            System.out.println("+---------+---------------------+-------+");
+        }
+    }
     private void handleDeleteUserAccount() {
         System.out.println("--- Delete User Account ---");
         String username = promptForString("Enter the username of the account to delete: ");
@@ -359,26 +378,7 @@ public class CliHandler {
         }
     }
 
-    private void handleViewAllProgressRecords() {
-        System.out.println("--- View All Progress Records ---");
-        // Make sure ProgressService.getAllProgressRecords() calls a DAO method that exists
-        List<TestProgress> progressRecords = progressService.getAllProgressRecords();
 
-        if (progressRecords.isEmpty()) {
-            System.out.println("No progress records found in the system.");
-        } else {
-            System.out.println("+---------+---------------------+-------+");
-            System.out.println("| User ID | Date & Time         | Score |");
-            System.out.println("+---------+---------------------+-------+");
-            for (TestProgress progress : progressRecords) {
-                System.out.printf("| %-7d | %-19s | %-5d |\n",
-                        progress.getUserId(),
-                        progress.getTestTimestamp().format(DTF),
-                        progress.getCmasScore());
-            }
-             System.out.println("+---------+---------------------+-------+");
-        }
-    }
 
     // --- Child Action Handlers ---
 
