@@ -1,9 +1,10 @@
 package com.pokemedquest.service;
 
+import org.mindrot.jbcrypt.BCrypt; // Always use the jBCrypt class
 import com.pokemedquest.dao.UserDao;
 import com.pokemedquest.model.User;
-
 import java.util.Optional;
+import java.util.List;
 
 /**
  * AuthService provides authentication-related services like user registration and login.
@@ -21,6 +22,19 @@ public class AuthService {
         this.userDao = userDao;
     }
 
+    public boolean deleteUserByUsername(String username) {
+        // Delegate the deletion to the UserDao
+        return userDao.deleteUserByUsername(username);
+    }
+   
+
+    public List<User> getAllUsers() {
+        // Assuming userDao has a method to retrieve all users
+        return userDao.getAllUsers();
+    }
+
+
+
     /**
      * Registers a new user.
      * NOTE: Password hashing MUST be implemented here in a real application.
@@ -32,12 +46,8 @@ public class AuthService {
      * otherwise an empty Optional.
      */
     public Optional<User> registerUser(String username, String plainPassword, String role) {
-        // --- TODO: Implement Password Hashing ---
-        // Use a library like BCrypt:
-        // String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
-        // For this example, we'll store the plain password HASH (WHICH IS WRONG - just demonstrating flow)
-        // IN A REAL APP, NEVER STORE OR PASS AROUND PLAIN PASSWORDS LIKE THIS BEYOND INITIAL HASHING
-        String hashedPassword = plainPassword; // <-- !!! REPLACE WITH ACTUAL HASHING !!!
+        // Use BCrypt from jBCrypt to hash the password
+        String hashedPassword = BCrypt.hashpw(plainPassword, BCrypt.gensalt());
 
         // Check if username already exists (optional, depends on DB constraints)
         if (userDao.findUserByUsername(username).isPresent()) {
@@ -71,15 +81,9 @@ public class AuthService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
 
-            // --- TODO: Implement Password Verification ---
-            // Use the same hashing library used during registration:
-            // if (BCrypt.checkpw(plainPassword, user.getPasswordHash())) {
-            //    return Optional.of(user); // Passwords match
-            // }
-            // For this example, we compare the plain password HASH (WHICH IS WRONG)
-            // IN A REAL APP, NEVER COMPARE PLAIN PASSWORDS
-            if (user.getPasswordHash().equals(plainPassword)) { // <-- !!! REPLACE WITH BCrypt.checkpw() !!!
-                 return Optional.of(user); // Login successful (using insecure comparison)
+            // Use BCrypt to verify the hashed password
+            if (BCrypt.checkpw(plainPassword, user.getPasswordHash())) {
+                return Optional.of(user); // Login successful
             }
         }
 

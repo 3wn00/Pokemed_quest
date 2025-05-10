@@ -13,7 +13,7 @@ C:.
 |           class_diagram.png
 |
 +---lib
-|       sqlite-jdbc-XYZ.jar
+|       sqlite-jdbc-poke.jar
 |
 +---src
 |   +---main
